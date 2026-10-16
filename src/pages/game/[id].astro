@@ -65,11 +65,23 @@ if (!game) {
                     </section>
                 )}
 
-                {game.publisher && game.publisher.description !== null && (
+                {/* Unlike the category block, shown without a description: it holds the link to the publisher's page. */}
+                {game.publisher && (
                     <section class="space-y-4 mt-6">
                         <h2 class="text-lg font-semibold text-slate-200 mb-2">About the publisher</h2>
                         <div class="text-slate-400 space-y-4">
-                            <p data-testid="game-details-publisher-description">{game.publisher.description}</p>
+                            {game.publisher.description !== null && (
+                                <p data-testid="game-details-publisher-description">{game.publisher.description}</p>
+                            )}
+                            <p>
+                                <a
+                                    href={`/publisher/${game.publisher.id}`}
+                                    class="rounded text-blue-400 hover:text-blue-300 hover:underline focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    data-testid="game-details-publisher-link"
+                                >
+                                    All games by {game.publisher.name}
+                                </a>
+                            </p>
                         </div>
                     </section>
                 )}
