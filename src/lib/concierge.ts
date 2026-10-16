@@ -62,7 +62,7 @@ const CONCIERGE_RULES = [
 ].join('\n');
 
 const NOT_CONFIGURED = 'The Backer Concierge is not configured: no API key is set on this server.';
-const UNREADABLE_REQUEST = 'The request must be JSON with a `messages` list ending with your question.';
+const UNREADABLE_REQUEST = 'The request must be JSON with a `messages` list.';
 const MODEL_FAILED = 'The Backer Concierge could not answer right now. Please try again.';
 
 /** The system prompt: the rules, then the whole catalog. The same catalog always gives the same text. */
@@ -70,23 +70,42 @@ function buildSystemPrompt(catalog: CatalogExport): string {
     return `${CONCIERGE_RULES}\n\n<catalog>\n${serializeCatalogExport(catalog)}</catalog>`;
 }
 
-/** The visitor's question, read from the raw request body, or null when there is none to read. */
-function readQuestion(body: string): ConciergeMessage | null {
+/** The longest question a visitor may ask, in characters. */
+const MAX_QUESTION_LENGTH = 500;
+
+type ReadResult = { messages: ConciergeMessage[] } | { error: string };
+
+/** The visitor's question, read from the raw request body, or the reason it cannot be asked. */
+function readConversation(body: string): ReadResult {
     let request: unknown;
     try {
         request = JSON.parse(body);
     } catch {
-        return null;
+        return { error: UNREADABLE_REQUEST };
     }
 
     const messages = (request as { messages?: unknown } | null)?.messages;
-    if (!Array.isArray(messages) || messages.length === 0) {
-        return null;
+    if (!Array.isArray(messages)) {
+        return { error: UNREADABLE_REQUEST };
+    }
+    if (messages.length !== 1) {
+        return { error: 'Send exactly one question.' };
     }
 
-    const last: unknown = messages[messages.length - 1];
-    const { role, content } = (last ?? {}) as { role?: unknown; content?: unknown };
-    return role === 'user' && typeof content === 'string' ? { role, content } : null;
+    const { role, content } = (messages[0] ?? {}) as { role?: unknown; content?: unknown };
+    if (role !== 'user') {
+        return { error: 'The question must come from the visitor (role "user").' };
+    }
+    if (typeof content !== 'string') {
+        return { error: 'The question must be text.' };
+    }
+    if (content.trim().length === 0) {
+        return { error: 'The question is empty. Please type a question.' };
+    }
+    if (content.length > MAX_QUESTION_LENGTH) {
+        return { error: `The question is too long: ${MAX_QUESTION_LENGTH} characters at most.` };
+    }
+    return { messages: [{ role, content }] };
 }
 
 /** The model's answer, read from its raw structured output, or null when it has none. */
@@ -112,15 +131,15 @@ export async function answerConcierge(
         return { status: 503, body: { error: NOT_CONFIGURED } };
     }
 
-    const question = readQuestion(body);
-    if (!question) {
-        return { status: 400, body: { error: UNREADABLE_REQUEST } };
+    const conversation = readConversation(body);
+    if ('error' in conversation) {
+        return { status: 400, body: { error: conversation.error } };
     }
 
     const catalog = toCatalogExport(await getAllGames(db));
     let reply: ModelReply;
     try {
-        reply = await askModel(buildSystemPrompt(catalog), [question]);
+        reply = await askModel(buildSystemPrompt(catalog), conversation.messages);
     } catch {
         return { status: 502, body: { error: MODEL_FAILED } };
     }

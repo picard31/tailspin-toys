@@ -100,6 +100,39 @@ describe('answerConcierge', () => {
         expect(calls).toHaveLength(0);
     });
 
+    it.each([
+        ['a body without messages', { question: 'Which game?' }],
+        ['an empty messages list', { messages: [] }],
+        ['messages that are not a list', { messages: 'Which game?' }],
+        ['a content that is not text', { messages: [{ role: 'user', content: 42 }] }],
+        ['an empty question', { messages: [{ role: 'user', content: '' }] }],
+        ['a whitespace-only question', { messages: [{ role: 'user', content: ' \n\t ' }] }],
+        ['a question of 501 characters', { messages: [{ role: 'user', content: 'a'.repeat(501) }] }],
+        ['a message from the Concierge', { messages: [{ role: 'assistant', content: 'Which game?' }] }],
+        [
+            'two messages',
+            {
+                messages: [
+                    { role: 'user', content: 'Which game?' },
+                    { role: 'user', content: 'Which puzzle game?' },
+                ],
+            },
+        ],
+    ])('returns 400 for %s, without asking the model', async (_label, request) => {
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, JSON.stringify(request), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(400);
+        expect(result.body).toEqual({ error: expect.any(String) });
+        expect(calls).toHaveLength(0);
+    });
+
+    it('accepts a question of 500 characters', async () => {
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, question('a'.repeat(500)), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+        expect(calls).toHaveLength(1);
+    });
+
     it('gives the model a system prompt that contains every game of the catalog', async () => {
         const { askModel, calls } = fakeAskModel();
         await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
