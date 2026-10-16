@@ -12,7 +12,7 @@ Origine : la revue après fusion de la PR #13, et la limite connue que sa descri
 
 ## Critères d'acceptation
 
-- [ ] Le serveur s'arrête, avec un message sur stderr, quand le fichier de la base est absent, que son chemin vienne de `DATABASE_URL` ou non.
+- [ ] Le serveur s'arrête, avec un message sur stderr, quand le fichier de la base est absent, que son chemin vienne de `DATABASE_URL` ou non. Un `DATABASE_URL=:memory:`, qui n'a pas de fichier et serait vide, est refusé de même.
 - [ ] Le serveur ouvre la base en lecture seule, sans rien créer sur le disque.
 - [ ] Le reste du site, le seed et les tests ouvrent toujours la base comme avant.
 - [ ] La règle tient dans du code de `src/lib/` prouvé par Vitest.

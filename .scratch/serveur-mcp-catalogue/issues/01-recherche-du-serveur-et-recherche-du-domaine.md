@@ -17,16 +17,16 @@ Origine : la revue après fusion de la PR #13 (« Un serveur MCP en stdio pour l
 
 ## La décision à prendre
 
-Elle revient au propriétaire du dépôt, au plus tard à la fusion de la PR #11. Deux voies :
+Elle revient au propriétaire du dépôt, avant la fusion de la PR #11, qui définit dans `GLOSSARY.md` la Recherche comme un texte comparé « aux Jeux dont le titre le contient ». Deux voies, au moins :
 
 1. **Renommer l'outil** (par exemple `find_games` et `findGames`) et écrire dans `GLOSSARY.md` qu'il n'est pas la Recherche, puisqu'il cherche aussi dans la Catégorie et l'Éditeur.
 2. **L'aligner sur la Recherche** : le titre seul, avec la fonction de correspondance du 01.
 
-Dans les deux cas, garder une seule fonction de correspondance pour le Catalogue.
+Retirer l'outil serait une troisième voie. Quelle qu'elle soit, garder une seule fonction de correspondance pour le Catalogue.
 
 ## Critères d'acceptation
 
-- [ ] La décision est prise, et notée sous `## Comments`.
+- [ ] La décision est prise avant la fusion de la PR #11, et notée sous `## Comments`.
 - [ ] Le nom de l'outil MCP, celui de la fonction de `src/lib/` et `GLOSSARY.md` disent la même chose.
-- [ ] Une seule fonction de correspondance sert l'accueil et le serveur MCP, avec ses tests Vitest.
+- [ ] Une fois la PR #11 fusionnée, une seule fonction de correspondance sert l'accueil et le serveur MCP, avec ses tests Vitest.
 - [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
