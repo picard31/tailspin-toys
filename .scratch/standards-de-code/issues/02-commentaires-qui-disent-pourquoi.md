@@ -30,3 +30,9 @@ Ce ticket crée la règle **commentaires** ; les tickets 03 et 04 y ajouteront c
   - « Never reuse a running server » dans la configuration Playwright.
 - [x] Dans les tests e2e et la configuration Playwright, rien d'autre ne change que des commentaires.
 - [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+
+## Comments
+
+Livré par la PR picard31/tailspin-toys#1. Des deux commentaires `first()` des tests e2e, celui de l'en-tête garde sa raison, le mode strict. Celui des cartes de jeu, dans le test des SVG décoratifs, invoquait aussi le mode strict, à tort : `count()` et `nth(i)` n'y sont pas soumis. Il dit maintenant la vraie raison, qu'une carte suffit puisque toutes affichent les mêmes icônes.
+
+Des trois commentaires du `<script>` du menu de l'en-tête, les deux premiers sont supprimés. Le troisième, qui paraphrasait le gestionnaire d'Escape, est remplacé par un commentaire qui dit pourquoi le focus revient au bouton : un utilisateur au clavier reprend là où il a ouvert le menu.

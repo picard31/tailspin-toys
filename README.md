@@ -48,7 +48,7 @@ Les tests e2e (Playwright, `npm run test:e2e`) ne servent pas pendant la formati
 
 ## Le backlog
 
-Neuf tickets, rédigés par l'équipe de GitHub, attendent dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Seul le 08, les standards de code, est livré ; l'ordre des autres est dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
+Neuf tickets, rédigés par l'équipe de GitHub, sont dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Seul le 08, les standards de code, est livré ; l'ordre des autres est dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
 
 | Ticket | En bref |
 |---|---|

@@ -86,7 +86,7 @@ export default [
                 require: { FunctionDeclaration: true, ArrowFunctionExpression: true, FunctionExpression: true },
             }],
             'jsdoc/require-description': ['error', { contexts: EXPORTED_FUNCTIONS }],
-            'jsdoc/require-param': ['error', { contexts: EXPORTED_FUNCTIONS }],
+            'jsdoc/require-param': ['error', { contexts: EXPORTED_FUNCTIONS, enableFixer: false }],
             'jsdoc/require-param-description': ['error', { contexts: EXPORTED_FUNCTIONS }],
             'jsdoc/require-returns': ['error', { contexts: EXPORTED_FUNCTIONS }],
             'jsdoc/require-returns-description': ['error', { contexts: EXPORTED_FUNCTIONS }],
