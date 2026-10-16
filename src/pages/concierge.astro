@@ -60,3 +60,81 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
     </form>
   </div>
 </Layout>
+
+<script>
+  interface ConciergeReply {
+    answer?: unknown;
+    error?: unknown;
+  }
+
+  const UNREACHABLE = 'The Backer Concierge could not be reached. Please try again.';
+
+  const form = document.querySelector<HTMLFormElement>('[data-testid="concierge-form"]');
+  const field = document.querySelector<HTMLInputElement>('[data-testid="concierge-question"]');
+  const ask = document.querySelector<HTMLButtonElement>('[data-testid="concierge-ask"]');
+  const log = document.querySelector<HTMLElement>('[data-testid="concierge-log"]');
+  const status = document.querySelector<HTMLElement>('[data-testid="concierge-status"]');
+
+  /** A labelled block of plain text: text is never interpreted as HTML. */
+  function entry(label: string, text: string, classes: string, testId?: string): HTMLElement {
+    const block = document.createElement('div');
+    block.className = `p-4 rounded-xl border ${classes}`;
+    const heading = document.createElement('p');
+    heading.className = 'text-xs font-medium uppercase tracking-wide text-slate-400 mb-1';
+    heading.textContent = label;
+    const body = document.createElement('p');
+    body.className = 'whitespace-pre-line text-slate-100';
+    body.textContent = text;
+    if (testId) {
+      body.dataset.testid = testId;
+    }
+    block.append(heading, body);
+    return block;
+  }
+
+  /** Send the question to the route; a network failure reads as an error reply. */
+  async function askConcierge(question: string): Promise<{ ok: boolean; reply: ConciergeReply }> {
+    try {
+      const response = await fetch('/api/concierge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: question }] }),
+      });
+      return { ok: response.ok, reply: (await response.json()) as ConciergeReply };
+    } catch {
+      return { ok: false, reply: { error: UNREACHABLE } };
+    }
+  }
+
+  if (form && field && ask && log && status) {
+    let pending = false;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      // One question at a time: the button does not send a second one while waiting.
+      if (pending) {
+        return;
+      }
+      pending = true;
+      ask.setAttribute('aria-disabled', 'true');
+      status.textContent = 'Thinking…';
+
+      const question = field.value;
+      log.append(entry('You', question, 'bg-slate-800 border-slate-700'));
+      const { ok, reply } = await askConcierge(question);
+
+      if (ok && typeof reply.answer === 'string') {
+        log.append(entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer'));
+        field.value = '';
+      } else {
+        const message = typeof reply.error === 'string' ? reply.error : UNREACHABLE;
+        log.append(entry('Backer Concierge', message, 'bg-red-950/40 border-red-900', 'concierge-error'));
+      }
+
+      status.textContent = '';
+      ask.removeAttribute('aria-disabled');
+      pending = false;
+      field.focus();
+    });
+  }
+</script>
