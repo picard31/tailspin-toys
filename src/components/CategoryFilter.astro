@@ -3,7 +3,7 @@ import { getDatabase } from '../lib/db';
 import { getAllCategories } from '../lib/category-filter';
 
 interface Props {
-    /** The category ids kept from the URL, whose options are checked. */
+    /** The category ids kept from the URL, whose options are checked; an empty list checks "All categories". */
     selectedIds: number[];
 }
 

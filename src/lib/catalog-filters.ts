@@ -19,11 +19,13 @@ export function readCatalogFilters(searchParams: URLSearchParams): CatalogFilter
 }
 
 /**
- * Whether the catalog is filtered, which gives the page its "Filtered games" title.
+ * Whether the catalog is filtered, which gives the page its "Filtered games" title. It reads every
+ * family the same way, so that adding a family to `CatalogFilters` does not touch it.
  *
  * @param filters - The filters kept from the URL.
- * @returns `true` when at least one filter restricts the catalog.
+ * @returns `true` when at least one filter restricts the catalog: a non-empty list, or a value
+ *   other than `null`.
  */
 export function hasActiveFilters(filters: CatalogFilters): boolean {
-    return filters.categoryIds.length > 0;
+    return Object.values(filters).some((value) => (Array.isArray(value) ? value.length > 0 : value !== null));
 }

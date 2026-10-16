@@ -1,6 +1,6 @@
 /**
  * These interfaces describe the shape returned by the Drizzle data-access
- * helpers in `src/lib/games.ts` and consumed by Astro pages/components.
+ * helpers in `src/lib/` and consumed by Astro pages/components.
  */
 
 /** Represents a game publisher (summary form used in listings). */
