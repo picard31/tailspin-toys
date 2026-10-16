@@ -174,6 +174,11 @@ function readModelOutput(reply: ModelReply): ModelOutput | null {
     if (typeof answer !== 'string' || !Array.isArray(gameIds) || !gameIds.every(Number.isInteger)) {
         return null;
     }
+    // The page sends the answer back as a Concierge message: one the conversation rules reject
+    // would turn every next question into a 400.
+    if (answer.trim().length === 0 || answer.length > MAX_LENGTH.assistant) {
+        return null;
+    }
     return { answer, gameIds };
 }
 

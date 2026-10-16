@@ -69,25 +69,14 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
 </Layout>
 
 <script>
-    /** A recommended game, as the catalog export describes it. */
-    interface RecommendedGame {
-        id: number;
-        title: string;
-        category: string;
-        publisher: string;
-        starRating?: number;
-        ratingLabel: string;
-    }
+    import type { CatalogGame } from '../../db/export-catalog';
+    import type { ConciergeMessage } from '../lib/concierge';
+    import { clampRating } from '../lib/ratings';
 
     interface ConciergeReply {
         answer?: unknown;
         games?: unknown;
         error?: unknown;
-    }
-
-    interface ConciergeMessage {
-        role: 'user' | 'assistant';
-        content: string;
     }
 
     const UNREACHABLE = 'The Backer Concierge could not be reached. Please try again.';
@@ -117,7 +106,7 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
     }
 
     /** The recommendations under an answer: a link to each game's page, with its category, publisher and rating. */
-    function recommendationList(games: RecommendedGame[]): HTMLElement {
+    function recommendationList(games: CatalogGame[]): HTMLElement {
         const list = document.createElement('ul');
         list.className = 'mt-3 space-y-2';
         list.setAttribute('aria-label', 'Recommended games');
@@ -130,7 +119,11 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
             link.className =
                 'font-semibold text-blue-400 hover:text-blue-300 hover:underline rounded focus:outline-none focus:ring-2 focus:ring-blue-500';
             link.textContent = game.title;
-            const rating = game.starRating === undefined ? game.ratingLabel : `${game.ratingLabel} ${game.starRating.toFixed(1)}`;
+            link.dataset.testid = 'concierge-game-link';
+            // Clamped like the game page's rating, so both show the same figure.
+            const rating = game.starRating === undefined
+                ? game.ratingLabel
+                : `${game.ratingLabel} ${clampRating(game.starRating).toFixed(1)}`;
             const details = document.createElement('p');
             details.className = 'text-sm text-slate-400';
             details.textContent = `${game.category} · ${game.publisher} · ${rating}`;
@@ -194,7 +187,7 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
                 // Only an answered question enters the history, followed by the answer's text.
                 history.push(asked, { role: 'assistant', content: reply.answer });
                 const answer = entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer');
-                const games = Array.isArray(reply.games) ? (reply.games as RecommendedGame[]) : [];
+                const games = Array.isArray(reply.games) ? (reply.games as CatalogGame[]) : [];
                 if (games.length > 0) {
                     answer.append(recommendationList(games));
                 }

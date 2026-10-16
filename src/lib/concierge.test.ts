@@ -310,6 +310,10 @@ describe('answerConcierge', () => {
         ['gameIds is not a list', { stopReason: 'end_turn', output: '{"answer": "Try these.", "gameIds": 1}' }],
         ['gameIds holds a decimal', { stopReason: 'end_turn', output: '{"answer": "Try these.", "gameIds": [1.5]}' }],
         ['gameIds holds a string', { stopReason: 'end_turn', output: '{"answer": "Try these.", "gameIds": ["1"]}' }],
+        // The page sends the answer back as a Concierge message, so it must pass the conversation rules.
+        ['the answer is empty', { stopReason: 'end_turn', output: '{"answer": "", "gameIds": []}' }],
+        ['the answer is only whitespace', { stopReason: 'end_turn', output: '{"answer": "  \\n ", "gameIds": []}' }],
+        ['the answer is over 4,000 characters', { stopReason: 'end_turn', output: JSON.stringify({ answer: 'a'.repeat(4001), gameIds: [] }) }],
     ])('returns 502, inviting to try again, when %s', async (_label, reply) => {
         const { askModel } = fakeAskModel(reply);
         const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });

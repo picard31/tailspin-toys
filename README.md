@@ -34,7 +34,7 @@ Quand c'est Claude Code qui lance `npm run dev` sous macOS ou Linux, Astro 7 pas
 
 La page `/concierge` répond aux questions des Visiteurs avec l'API Claude, à partir du Catalogue. Elle a besoin d'une clé d'API : pendant la formation, c'est la clé que le formateur distribue, plafonnée en dépenses et révoquée après la session.
 
-Copiez `.env.example` en `.env`, à la racine (`.env` est ignoré par git), puis collez la clé après `ANTHROPIC_API_KEY=` et relancez `npm run dev`. La clé reste sur le serveur : elle n'entre ni dans le build ni dans le navigateur, et le Concierge n'utilise aucun autre identifiant présent sur le poste.
+Copiez `.env.example` en `.env`, à la racine (`.env` est ignoré par git), puis collez la clé après `ANTHROPIC_API_KEY=` et relancez `npm run dev`. La clé reste sur le serveur : elle n'entre ni dans le build ni dans le navigateur. Le Concierge n'utilise que la variable `ANTHROPIC_API_KEY`, jamais un profil `ant auth login` ni `ANTHROPIC_AUTH_TOKEN`. Attention : une variable `ANTHROPIC_API_KEY` exportée dans le terminal passe avant celle de `.env` ; si vous en avez une à vous, retirez-la avant de lancer le serveur, pour que le Concierge utilise bien la clé de formation.
 
 Sans clé, le reste du site marche, les tests passent, et le Concierge répond qu'il n'est pas configuré.
 

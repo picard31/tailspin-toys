@@ -13,10 +13,14 @@ Ce comportement vient du modèle : ce ticket complète le prompt système, et on
 
 ## Critères d'acceptation
 
-- [ ] Le prompt système dit au modèle de poser une seule question courte quand la demande est vague ou dépend d'une donnée absente du Catalogue, avec `gameIds` vide.
-- [ ] Le prompt reste identique d'un appel à l'autre : les tests existants le prouvent toujours.
+- [x] Le prompt système dit au modèle de poser une seule question courte quand la demande est vague ou dépend d'une donnée absente du Catalogue, avec `gameIds` vide.
+- [x] Le prompt reste identique d'un appel à l'autre : les tests existants le prouvent toujours.
 - [ ] On vérifie à la main, sur `npm run dev`, avec une clé :
   - « Recommend me a good game » donne une seule question courte, sans Recommandation ;
   - répondre « Strategy, please » donne des Recommandations de la Catégorie Strategy ;
   - « Which game is best for six players? » donne une question courte, ou une réponse qui dit que le Catalogue n'enregistre pas le nombre de joueurs, sans Recommandation inventée.
-- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+- [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+
+## Comments
+
+Livré par la PR #4. Les trois questions restent à vérifier avec une clé.
