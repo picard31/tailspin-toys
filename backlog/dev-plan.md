@@ -25,11 +25,13 @@ Le ticket 07 se découpe lui-même en quatre tranches (voir sa section *Delivery
 | Vague | En parallèle | Prérequis | État |
 |---|---|---|---|
 | 0 | **08** seul | aucun | ✅ Livrée le 16/10/2026 : [PR #1](https://github.com/picard31/tailspin-toys/pull/1) fusionnée |
-| 1 | **07.1** · **03** · **09** (ses neuf tickets l'un après l'autre) | 08 fusionné | Débloquée |
-| 2 | **07.2** · **07.3** · **01** · **02** · **05** · **04** | 07.1 fusionnée ; 03 fusionné pour 04 | En attente |
+| 1 | **07.1** · **03** · **09** (ses neuf tickets l'un après l'autre) | 08 fusionné | ✅ Livrée le 16/10/2026 : [PR #3](https://github.com/picard31/tailspin-toys/pull/3), [PR #4](https://github.com/picard31/tailspin-toys/pull/4) et [PR #2](https://github.com/picard31/tailspin-toys/pull/2) fusionnées |
+| 2 | **07.2** · **07.3** · **01** · **02** · **05** · **04** | 07.1 fusionnée ; 03 fusionné pour 04 | Débloquée |
 | 3 | **07.4** · **06** | 07.2, 07.3, 01 et 02 fusionnés | En attente |
 
-La vague 0 a livré les standards de code (spec `.scratch/standards-de-code/spec.md`, ADR 0002) : `npm run lint` impose désormais le format et la présence des TSDoc et des commentaires de Props. Une branche ouverte avant sa fusion se rebase sur `main` : ses conflits viennent surtout du reformatage, et `npm run lint -- --fix` remet ensuite son code au format.
+La vague 0 a livré les standards de code (spec `.scratch/standards-de-code/spec.md`, ADR 0002) : `npm run lint` impose désormais le format et la présence des TSDoc et des commentaires de Props. Une branche ouverte avant sa fusion se met à jour avec `main` par une fusion de `picard31/main` : un rebase réécrirait des commits déjà poussés. Ses conflits viennent surtout du reformatage, et `npm run lint -- --fix` remet ensuite son code au format.
+
+La vague 1 a livré le filtre du Catalogue par une Catégorie (07.1, ADR 0001), les descriptions de la fiche de jeu (03) et le Backer Concierge (09, ADR 0003). Chaque PR a été relue par un agent dédié avant sa fusion, dans l'ordre 03, 09, puis 07.1. Entre elles, un seul conflit : `GLOSSARY.md`, complété des deux côtés, réglé en gardant la version la plus complète. Les vérifications du Concierge qui demandent une vraie clé d'API restent à faire : elles sont notées sous `## Comments` dans ses tickets.
 
 Les dépendances, une par ligne :
 
@@ -43,23 +45,23 @@ Les dépendances, une par ligne :
 
 - **08 seul, d'abord** : il change les règles que les autres tickets suivent. Les règles de format qu'il impose par ESLint reformateraient beaucoup de fichiers : `src/pages/index.astro` est indenté à 2 espaces, `src/lib/games.ts` et `src/components/GameCard.astro` à 4. Il ajoute aussi un TSDoc à chaque fonction exportée de `src/lib/` et de `db/`. Mené en parallèle, il entrerait en conflit avec toutes les branches.
 - **07.1 avant 01, 02, 05 et 06** : elle passe l'accueil en rendu à la demande, les filtres étant lus dans la query string d'un formulaire GET (ADR 0001). Elle crée `getCatalogGames`, où chaque famille de filtres ajoute une condition, et le message « No games match these filters ». L'ADR prévoit d'y greffer la recherche (01), le tri (02) et la pagination (06), comme d'autres paramètres de la même URL. 07.1 calcule aussi le nombre total de jeux, dont 05 a besoin ; menés en parallèle, les deux le calculeraient chacun de son côté, dans les mêmes lignes de `index.astro`.
-- **03 en parallèle de 07.1** : 03 ne touche pas à `src/lib/games.ts`, que 07.1 modifie en haut (les imports) et en bas (ses fonctions). Sa lecture, `getGameDetails`, vit dans son propre module. Ses types, `GameDetails`, `CategoryDetails` et `PublisherDetails`, s'ajoutent à côté de `Game`, `Category` et `Publisher` sans les changer, sans quoi `getAllCategories` de la 07.1 ne passerait plus `typecheck` après la fusion. Git fusionne les deux seul.
+- **03 en parallèle de 07.1** : 03 ne touche pas à `src/lib/games.ts`, que 07.1 modifie en haut (les imports) et en bas (ses fonctions). Sa lecture, `getGameDetails`, vit dans son propre module. Ses types, `GameDetails`, `CategoryDetails` et `PublisherDetails`, s'ajoutent à côté de `Game`, `Category` et `Publisher` sans les changer, sans quoi `getAllCategories` de la 07.1 ne passerait plus `typecheck` après la fusion. Git fusionne seul le code des deux ; seul `GLOSSARY.md`, que les deux branches complètent, demande une résolution à la main.
 - **03 avant 04** : 04 réutilise `GameDetails`, la description de l'éditeur que 03 remonte, et le bloc « About the publisher » de `src/pages/game/[id].astro`, où il ajoute son lien.
-- **09 en parallèle de tout** : il ne touche aucun fichier des autres tickets de la vague. Son code vit dans `src/lib/concierge.ts`, et il lit le Catalogue avec `getAllGames` et `toCatalogExport`, qui existent déjà, avec leurs tests.
+- **09 en parallèle de tout** : il ne touche aucun fichier de code des autres tickets de la vague ; seul `GLOSSARY.md` lui est commun avec eux. Son code vit dans `src/lib/concierge.ts`, et il lit le Catalogue avec `getAllGames` et `toCatalogExport`, qui existent déjà, avec leurs tests.
 - **06 en dernier** : la pagination découpe le résultat des filtres, de la recherche et du tri, et modifie la ligne « Showing X of Y games ». Faite plus tôt, elle découperait le catalogue en pages avant de le filtrer, ou chaque ticket suivant devrait la reprendre. Avec 21 jeux dans `db/games.csv`, c'est aussi le ticket le moins urgent.
 
 ## Fusionner la vague 2
 
-01, 07.2 et 07.3 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, et un contrôle dans `CatalogFilters.astro` ; 02 modifie le `orderBy` de la même fonction. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et rebaser les autres après chaque fusion.
+01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, et un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie ; 02 modifie le `orderBy` de la même fonction. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et mettre les autres à jour avec `main` après chaque fusion.
 
 ## Avant de lancer
 
-- **L'ADR 0001 n'est pas sur `main`** : il n'existe que sur `origin/secours/07-filtres`, avec le glossaire et la spec du 07, déjà découpée en quatre tickets sous `.scratch/filtrer-les-jeux/`. Si 01 ou 02 démarrent avant 07.1, un agent pourrait choisir de filtrer dans le navigateur, une option que l'ADR écarte.
-- **07.1 est déjà faite** sur `origin/secours/07-filtres-01-fait` : la vague 2 peut partir de là. Les noms `getCatalogGames` et `CatalogFilters.astro` cités plus haut viennent de cette branche.
+- **L'ADR 0001 est sur `main`** depuis la PR #2, avec la spec du 07, découpée en quatre tickets sous `.scratch/filtrer-les-jeux/`. La recherche (01), le tri (02) et la pagination (06) s'appuient sur l'accueil rendu à la demande, jamais sur un filtrage dans le navigateur, une option que l'ADR écarte.
+- **07.1 est fusionnée** (PR #2) : la vague 2 part de `picard31/main`, où vivent `getCatalog`, `getCatalogGames` et `CatalogFilters.astro`.
 - **09 est tranché** : l'API Claude (`claude-opus-5-5`), une clé de formation dans `.env`, pas de recherche web (spec `.scratch/backer-concierge/spec.md`, ADR 0003). Avant la vague, le formateur crée la clé, la plafonne en dépenses et la distribue ; il la révoque après la session.
-- **Le piège du 04** : `src/components/GameCard.astro` est un grand lien `<a>`. Un lien vers l'éditeur à l'intérieur serait un lien imbriqué dans un lien, du HTML invalide. Le mettre sur la fiche de jeu, ce que le critère permet (« and/or »).
+- **Le piège du 04** : `src/components/GameCard.astro` est un grand lien `<a>`. Un lien vers l'éditeur à l'intérieur serait un lien imbriqué dans un lien, du HTML invalide. Le mettre sur la fiche de jeu, ce que le critère permet (« and/or »). Le 04 réutilise aussi `getGameDetails` (`src/lib/game-details.ts`), qui reprend la sélection et les jointures de `src/lib/games.ts` parce que le 03 ne devait pas toucher ce fichier : le 04 peut les factoriser, pour que les deux requêtes ne divergent pas.
 - **Les tickets de la vague 1 sont sous `.scratch/`**, comme l'attend `docs/agents/issue-tracker.md` :
-  - 07.1 : `.scratch/filtrer-les-jeux/issues/01-une-categorie.md`, sur `origin/secours/07-filtres` ;
+  - 07.1 : `.scratch/filtrer-les-jeux/issues/01-une-categorie.md` ;
   - 03 : `.scratch/descriptions-fiche-de-jeu/issues/01-descriptions.md` ;
   - 09 : les neuf tickets de `.scratch/backer-concierge/issues/`, de `01-la-page.md` à `09-la-question-de-clarification.md`, dans l'ordre des numéros.
 
