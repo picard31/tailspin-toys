@@ -152,3 +152,10 @@ Chaque Éditeur a sa Page Éditeur, à l'adresse `/publisher/<id>`. Sur la Fiche
   - Le module de la Fiche, la Fiche elle-même et les nouveaux fichiers ne sont touchés par aucune autre branche.
   - La 07.2 crée sa propre famille Éditeur, sans lien avec ce ticket.
 - Le glossaire a gagné **Fiche** et **Page Éditeur**. La définition d'**Éditeur** admet maintenant un Éditeur qui n'a encore aucun Jeu.
+
+La livraison se fait en deux tranches verticales, chacune dans son ticket sous `issues/`, l'une après l'autre sur la même branche. Elles ne touchent aucun fichier en commun.
+
+| Ticket | Bloqué par | Livre |
+|---|---|---|
+| 01 La Page Éditeur | — | La Page Éditeur de chaque Éditeur, atteinte par son URL, et toute la lecture des données : `getPublisherGames`, `shownDescription` exportée, `getPublisherIds`, `getPublisherPage` et leurs tests. |
+| 02 Le lien depuis la Fiche | 01 | Le bloc « About the publisher » présent dès que le Jeu a un Éditeur, avec le lien « All games by <nom> ». Il clôt le ticket 04 du backlog. |
