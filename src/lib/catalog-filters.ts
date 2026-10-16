@@ -5,14 +5,25 @@ export interface CatalogFilters {
     categoryIds: number[];
 }
 
-/** Read the filters from the URL, each family reading its own parameter. */
+/**
+ * The filters kept from the URL, each family reading its own parameter, so that a new family
+ * adds one line here.
+ *
+ * @param searchParams - The home page's raw URL parameters.
+ * @returns The filters once invalid values are dropped; they also prefill the controls.
+ */
 export function readCatalogFilters(searchParams: URLSearchParams): CatalogFilters {
     return {
         categoryIds: readCategoryIds(searchParams),
     };
 }
 
-/** Whether at least one filter restricts the catalog. */
+/**
+ * Whether the catalog is filtered, which gives the page its "Filtered games" title.
+ *
+ * @param filters - The filters kept from the URL.
+ * @returns `true` when at least one filter restricts the catalog.
+ */
 export function hasActiveFilters(filters: CatalogFilters): boolean {
     return filters.categoryIds.length > 0;
 }

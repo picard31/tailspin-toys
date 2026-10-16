@@ -34,15 +34,21 @@ Quand c'est Claude Code qui lance `npm run dev` sous macOS ou Linux, Astro 7 pas
 
 ```bash
 npm run test:unit       # Vitest : 39 tests, en moins d'une seconde
-npm run lint            # ESLint
+npm run lint            # ESLint : le code, son format, les TSDoc et les Props
 npm run typecheck       # TypeScript 7 (tsgo) sur db/ et src/lib/
 ```
 
 Les tests e2e (Playwright, `npm run test:e2e`) ne servent pas pendant la formation : ils demandent un navigateur de test, que les postes n'installent pas.
 
+## Standards de code
+
+- **Format** : 4 espaces, apostrophes simples, points-virgules, virgule finale en multiligne ; `npm run lint` l'impose et `npm run lint -- --fix` le corrige ([règle `format`](.claude/rules/format.md), [ADR 0002](docs/adr/0002-format-impose-par-eslint-stylistic.md)).
+- **Commentaires** : un commentaire dit pourquoi (une intention, un choix, un piège), jamais ce que le code dit déjà, et un commentaire périmé est un bug ([règle `commentaires`](.claude/rules/commentaires.md)).
+- **Documentation** : un TSDoc complet sur chaque fonction exportée de `db/` et `src/lib/`, un commentaire sur chaque prop des composants, dont `npm run lint` vérifie la présence ([règle `commentaires`](.claude/rules/commentaires.md)).
+
 ## Le backlog
 
-Neuf tickets, rédigés par l'équipe de GitHub, attendent dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Aucun n'est encore codé.
+Neuf tickets, rédigés par l'équipe de GitHub, sont dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Seul le 08, les standards de code, est livré ; l'ordre des autres est dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
 
 | Ticket | En bref |
 |---|---|
@@ -61,7 +67,7 @@ Vous pouvez aussi partir de votre propre idée : une liste de souhaits, des avis
 ## Le harness Claude Code
 
 - `CLAUDE.md` : les commandes, quand une tâche est finie, la langue des échanges et du code, et les pièges du projet.
-- `.claude/rules/` : quatre règles, chargées selon les fichiers que Claude lit (données, interface, tests unitaires, tests e2e).
+- `.claude/rules/` : six règles, chargées selon les fichiers que Claude lit (données, interface, tests unitaires, tests e2e, commentaires, format).
 - `.claude/settings.json` : les tests unitaires, le lint, la vérification des types et le serveur de dev tournent sans demande de permission, et les worktrees de `claude -w` partent du commit courant (`"worktree": { "baseRef": "head" }`).
 
 ## Ce qui change par rapport à l'original

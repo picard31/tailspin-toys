@@ -13,37 +13,37 @@ export const prerender = false;
 
 const { games, total, filters } = await getCatalog(getDatabase(), Astro.url.searchParams);
 const title = hasActiveFilters(filters)
-  ? 'Filtered games - Tailspin Toys'
-  : 'Tailspin Toys - Crowdfunding your new favorite game!';
+    ? 'Filtered games - Tailspin Toys'
+    : 'Tailspin Toys - Crowdfunding your new favorite game!';
 ---
 
 <Layout title={title}>
-  <div class="py-8">
-    <PageHero
-      title="Welcome to Tailspin Toys"
-      subtitle="Find your next game! And maybe even back one! Explore our collection!"
-    />
+    <div class="py-8">
+        <PageHero
+            title="Welcome to Tailspin Toys"
+            subtitle="Find your next game! And maybe even back one! Explore our collection!"
+        />
 
-    <div>
-      <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
+        <div>
+            <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
 
-      <CatalogFilters filters={filters} />
+            <CatalogFilters filters={filters} />
 
-      <p class="mb-6 text-sm text-slate-400" data-testid="results-count">
-        Showing {games.length} of {total} games
-      </p>
+            <p class="mb-6 text-sm text-slate-400" data-testid="results-count">
+                Showing {games.length} of {total} games
+            </p>
 
-      {total === 0 ? (
-        <EmptyState text="No games available at the moment." />
-      ) : games.length === 0 ? (
-        <EmptyState>
-          <p data-testid="no-matching-games" class="text-slate-300">No games match these filters.</p>
-        </EmptyState>
-      ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
+            {total === 0 ? (
+                <EmptyState text="No games available at the moment." />
+            ) : games.length === 0 ? (
+                <EmptyState>
+                    <p data-testid="no-matching-games" class="text-slate-300">No games match these filters.</p>
+                </EmptyState>
+            ) : (
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
+                    {games.map((game) => <GameCard game={game} />)}
+                </div>
+            )}
         </div>
-      )}
     </div>
-  </div>
 </Layout>
