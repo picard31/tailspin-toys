@@ -105,6 +105,6 @@ Sous le sous-titre du bandeau d'accueil, une ligne courte présente le Résumé 
 ## Notes
 
 - Pas d'ADR : aucune décision de ce ticket n'est à la fois difficile à défaire, surprenante sans contexte et le fruit d'un arbitrage. La règle de portée est écrite dans la définition du Résumé du Catalogue, dans le glossaire. Le numéro 0006, réservé au ticket, reste libre.
-- Fusion avec la vague 2 : le 01 (`search`) et le 02 (`sort`) ajoutent eux aussi un champ à l'interface `Catalog` et à la ligne `return` de `getCatalog`. Ces conflits d'une ligne se règlent à la main, en gardant tous les champs.
+- Fusion avec la vague 2 : le 01 (`search`) et le 02 (`sort`) ajoutent eux aussi des champs à l'interface `Catalog` et au `return` de `getCatalog`. Ces conflits touchent plusieurs zones de `src/lib/games.ts` et de `src/pages/index.astro`, et se règlent à la main en gardant tous les champs et `getCatalogSummary` (voir le ticket et `backlog/dev-plan.md`, « Fusionner la vague 2 »).
 - Le terme Note est défini à l'identique par le ticket 02 (Tri), au même endroit du glossaire : git fusionne les deux ajouts sans conflit, tant que personne ne le reformule d'un seul côté.
 - Données actuelles : 21 Jeux, tous notés entre 3.0 et 5.0. La Note moyenne vaut 3.9.
