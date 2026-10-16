@@ -1,0 +1,58 @@
+Status: ready-for-agent
+Blocked by: aucun (peut démarrer tout de suite)
+
+# 01 : Afficher le Résumé du Catalogue sur l'accueil
+
+Spec : `../spec.md`. Source : `backlog/05-catalog-summary.md` (laissé intact). Vocabulaire : `GLOSSARY.md` (Résumé du Catalogue, Note, Note moyenne). Architecture : ADR 0001.
+
+## Ce qu'il faut construire
+
+Sous le sous-titre du bandeau d'accueil, le Visiteur lit le Résumé du Catalogue : « 21 games · ★ 3.9 average rating ». Le Résumé décrit toujours tout le Catalogue : il reste le même quand des Filtres sont actifs. Quand aucun Jeu n'a de Note, il affiche « No ratings yet ». La ligne « Showing N of M games » ne change pas.
+
+Un nouveau module de la couche de données calcule le Résumé, et `getCatalog` s'en sert à la place de son comptage actuel. Le Catalogue n'est ainsi compté qu'une fois par requête, et la page ne fait toujours qu'un appel.
+
+Ce ticket est livré en parallèle des tickets 01 (Recherche), 02 (Tri), 04 (pages d'Éditeur), 07.2 et 07.3. Pour limiter les conflits, il ne touche dans le module des Jeux qu'à `getCatalog`, à l'interface `Catalog` et aux imports. Il ne modifie aucun test existant.
+
+## Critères d'acceptation
+
+- [ ] Un nouveau module de la couche de données exporte `getCatalogSummary(db)`, qui rend un `CatalogSummary` de forme `{ total: number; averageRating: number | null }`, calculé par une seule requête d'agrégat sur tous les Jeux. Il porte un TSDoc, comme toute fonction exportée de la couche de données.
+- [ ] `total` compte tous les Jeux du Catalogue, notés ou non.
+- [ ] `averageRating` est la moyenne des Notes des seuls Jeux qui en ont une. Chaque Note y entre bornée à 0–5, selon la règle de `clampRating`. La moyenne est arrondie au dixième, au plus proche, la moitié vers le haut.
+- [ ] `averageRating` vaut `null` quand aucun Jeu n'a de Note, Catalogue vide compris. Il ne vaut jamais `0` ni `NaN`.
+- [ ] `getCatalog(db, searchParams)` appelle `getCatalogSummary` à la place de sa requête de comptage, et rend `{ games, total, averageRating, filters }`. L'interface `Catalog` gagne `averageRating: number | null`. `total` garde son nom et son sens : la taille du Catalogue entier, même filtré.
+- [ ] Dans le module des Jeux, rien d'autre ne change : ni `getCatalogGames`, ni la zone entre `getAllGameIds` et `getGameById`, réservée au ticket 04.
+- [ ] La page d'accueil n'appelle toujours que `getCatalog`. Le Résumé est un paragraphe placé dans l'emplacement libre du bandeau d'accueil, sous le sous-titre.
+- [ ] Le texte du Résumé :
+  - « 21 games · ★ 3.9 average rating » ;
+  - « 1 game » au singulier, « N games » sinon, « 0 games » compris ;
+  - la Note moyenne toujours avec une décimale (« 4.0 ») ;
+  - « 21 games · No ratings yet », sans étoile, quand aucun Jeu n'a de Note ;
+  - « 0 games · No ratings yet » pour un Catalogue vide.
+
+  Le Résumé n'est jamais masqué, et le nombre de Jeux notés n'est pas affiché.
+- [ ] L'étoile et le point médian sont masqués aux lecteurs d'écran (`aria-hidden`). Le paragraphe se lit « 21 games, 3.9 average rating ».
+- [ ] Le style est plus discret que le sous-titre (un texte gris plus petit), avec les nombres en gras et plus clairs. L'étoile est jaune, comme celle de la Note sur la fiche de jeu.
+- [ ] Les `data-testid` sont posés : `catalog-summary` sur le paragraphe, `catalog-summary-total` sur « 21 games », `catalog-summary-rating` sur la Note moyenne ou « No ratings yet ». `page-hero`, `results-count` et les autres ne changent pas.
+- [ ] Le titre de la page, « Featured Games », les Filtres, la ligne « Showing N of M games » et la grille ne changent pas.
+- [ ] Un fichier de test à part, à côté du nouveau module, prouve sur une base en mémoire créée par `createTestDatabase()` :
+  - `getCatalogSummary` :
+    - le total compte les Jeux notés et non notés ;
+    - la moyenne ignore les Jeux sans Note ;
+    - l'arrondi au dixième (3.9, 4.0 et 4.0 donnent 4.0) ;
+    - la borne 0–5 (une Note de 7 compte pour 5, une Note de -1 pour 0) ;
+    - `null` quand aucun Jeu n'a de Note ;
+    - `{ total: 0, averageRating: null }` sur un Catalogue vide ;
+  - `getCatalog` avec un Filtre de Catégorie actif : `total` et `averageRating` sont ceux du Catalogue entier, pas ceux des Jeux retenus.
+- [ ] Les tests existants, dont ceux de la famille Catégorie qui vérifient `total`, passent sans modification.
+- [ ] On vérifie à la main, sur `npm run dev` :
+  - « 21 games · ★ 3.9 average rating » avec le seed ;
+  - le même Résumé avec un Filtre actif ;
+  - la lecture dans l'arbre d'accessibilité.
+
+  Les cas « 1 game », « No ratings yet » et « 0 games » se vérifient sur une base modifiée à la main. Supprimer ensuite `tailspin.db` pour revenir au seed. On n'écrit pas de test e2e et on ne lance pas Playwright.
+- [ ] Aucun changement de schéma ni de migration.
+- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+
+## Notes de fusion
+
+Le 01 (`search`) et le 02 (`sort`) ajoutent eux aussi un champ à l'interface `Catalog` et à la ligne `return` de `getCatalog`. Le conflit tient en une ligne, à régler à la main en gardant tous les champs.
