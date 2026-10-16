@@ -3,7 +3,8 @@
  *
  * Kept framework-free and side-effect-free so the logic is unit-testable
  * without the Astro runtime (see `ratings.test.ts`). Consumed by the
- * `StarRating.astro` component and by the catalog export (`db/export-catalog.ts`).
+ * `StarRating.astro` component, the catalog export (`db/export-catalog.ts`) and the Concierge
+ * page's recommendations (`src/pages/concierge.astro`).
  */
 
 /**

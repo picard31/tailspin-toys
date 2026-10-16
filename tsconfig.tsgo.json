@@ -5,6 +5,7 @@
   },
   "include": [
     "db/**/*.ts",
+    "mcp/**/*.ts",
     "src/lib/**/*.ts",
     "src/types/**/*.ts",
     "e2e-tests/**/*.ts",

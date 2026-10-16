@@ -41,7 +41,7 @@ Sans clé, le reste du site marche, les tests passent, et le Concierge répond q
 ## Tester
 
 ```bash
-npm run test:unit       # Vitest : 39 tests, en moins d'une seconde
+npm run test:unit       # Vitest, en moins d'une seconde
 npm run lint            # ESLint : le code, son format, les TSDoc et les Props
 npm run typecheck       # TypeScript 7 (tsgo) sur db/ et src/lib/
 ```
@@ -56,7 +56,7 @@ Les tests e2e (Playwright, `npm run test:e2e`) ne servent pas pendant la formati
 
 ## Le backlog
 
-Neuf tickets, rédigés par l'équipe de GitHub, sont dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Seul le 08, les standards de code, est livré ; l'ordre des autres est dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
+Neuf tickets, rédigés par l'équipe de GitHub, sont dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Les vagues 0 et 1 sont livrées : le 08 (les standards de code), le 03, le 09 et la tranche 07.1 du 07 ; l'ordre des autres, et l'état de chaque vague, sont dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
 
 | Ticket | En bref |
 |---|---|
@@ -81,7 +81,7 @@ Vous pouvez aussi partir de votre propre idée : une liste de souhaits, des avis
 ## Ce qui change par rapport à l'original
 
 - Le contexte Copilot (`.github/copilot-instructions.md`, fichiers d'instructions, skills, workflows agentiques) est remplacé par le harness Claude Code ci-dessus.
-- L'adaptateur Node d'Astro est installé : les pages restent prérendues, et une route qui exporte `prerender = false` répond à la demande. Une route d'exemple, `GET /api/games/:id`, est testée dans `e2e-tests/api.spec.ts`.
+- L'adaptateur Node d'Astro est installé : les pages sont prérendues, sauf celles qui exportent `prerender = false`, comme l'accueil et les routes d'API, qui répondent à la demande. Une route d'exemple, `GET /api/games/:id`, est testée dans `e2e-tests/api.spec.ts`.
 - Les tests e2e marchent quand Claude Code les lance, et chaque worktree teste son propre serveur.
 - Windows : des fins de ligne LF partout, et des serveurs qui n'écoutent que sur la machine (pas d'alerte du pare-feu).
 - Les tickets, qui devenaient des issues GitHub dans un dépôt créé depuis le modèle, sont des fichiers de `backlog/`.
