@@ -1,15 +1,17 @@
-import { eq, asc, and, count } from 'drizzle-orm';
+import { eq, asc, and } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
 import { categoryCondition } from './category-filter';
 import { readCatalogSearch, searchCondition } from './catalog-search';
+import { getCatalogSummary } from './catalog-summary';
 
-/** The home page catalog: the games kept by the filters and the search, the catalog size, and the filters and search kept. */
+/** The home page catalog: the games kept by the filters and the search, the size and average rating of the whole catalog, and the filters and search kept. */
 export interface Catalog {
     games: Game[];
     total: number;
+    averageRating: number | null;
     filters: CatalogFilters;
     search: string | null;
 }
@@ -117,13 +119,13 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters, sea
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.
- * @returns The matching games sorted by title, the size of the whole catalog, and the filters and
- *   search kept.
+ * @returns The matching games sorted by title, the size and the average rating of the whole catalog
+ *   (`getCatalogSummary`, whatever the filters and the search), and the filters and search kept.
  */
 export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
     const filters = readCatalogFilters(searchParams);
     const search = readCatalogSearch(searchParams);
     const catalogGames = await getCatalogGames(db, filters, search);
-    const [{ total }] = await db.select({ total: count() }).from(games);
-    return { games: catalogGames, total, filters, search };
+    const { total, averageRating } = await getCatalogSummary(db);
+    return { games: catalogGames, total, averageRating, filters, search };
 }
