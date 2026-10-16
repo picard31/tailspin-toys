@@ -4,12 +4,14 @@ import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
 import { categoryCondition } from './category-filter';
+import { readCatalogSort, catalogOrderBy, type CatalogSort } from './catalog-sort';
 
-/** The home page catalog: the games kept by the filters, the catalog size and the filters kept. */
+/** The home page catalog: the games kept by the filters, the catalog size, and the filters and sort kept. */
 export interface Catalog {
     games: Game[];
     total: number;
     filters: CatalogFilters;
+    sort: CatalogSort;
 }
 
 const gameSelection = {
@@ -99,12 +101,13 @@ export async function getGameById(db: Database, id: number): Promise<Game | null
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param filters - The filters kept from the URL.
- * @returns The matching games sorted by title; every game when no filter is active.
+ * @param sort - The sort kept from the URL.
+ * @returns The matching games in the order of the sort; every game when no filter is active.
  */
-export async function getCatalogGames(db: Database, filters: CatalogFilters): Promise<Game[]> {
+export async function getCatalogGames(db: Database, filters: CatalogFilters, sort: CatalogSort): Promise<Game[]> {
     const rows = await baseGamesQuery(db)
         .where(and(categoryCondition(filters.categoryIds)))
-        .orderBy(asc(games.title));
+        .orderBy(...catalogOrderBy(sort));
     return rows.map(mapGame);
 }
 
@@ -113,11 +116,13 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters): Pr
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.
- * @returns The matching games sorted by title, the size of the whole catalog, and the filters kept.
+ * @returns The matching games in the order of the sort, the size of the whole catalog, and the
+ *   filters and sort kept.
  */
 export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
     const filters = readCatalogFilters(searchParams);
-    const catalogGames = await getCatalogGames(db, filters);
+    const sort = readCatalogSort(searchParams);
+    const catalogGames = await getCatalogGames(db, filters, sort);
     const [{ total }] = await db.select({ total: count() }).from(games);
-    return { games: catalogGames, total, filters };
+    return { games: catalogGames, total, filters, sort };
 }

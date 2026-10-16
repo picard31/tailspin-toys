@@ -1,13 +1,17 @@
 ---
 import type { CatalogFilters } from '../lib/catalog-filters';
+import { clearFiltersHref, type CatalogSort } from '../lib/catalog-sort';
 import CategoryFilter from './CategoryFilter.astro';
+import SortControls from './SortControls.astro';
 
 interface Props {
-    /** The filters kept from the URL, shown as the current state of each control. */
+    /** The filters kept from the URL, shown as the current state of each filter control. */
     filters: CatalogFilters;
+    /** The sort kept from the URL, shown by the sort controls and kept by "Clear filters". */
+    sort: CatalogSort;
 }
 
-const { filters } = Astro.props;
+const { filters, sort } = Astro.props;
 
 const focusRing =
     'focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800';
@@ -21,16 +25,18 @@ const focusRing =
 >
     <CategoryFilter selectedIds={filters.categoryIds} />
 
+    <SortControls sort={sort} />
+
     <div class="flex flex-wrap items-center gap-4">
         <button
             type="submit"
             class:list={['px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors', focusRing]}
             data-testid="apply-filters"
         >
-            Apply filters
+            Apply
         </button>
         <a
-            href="/"
+            href={clearFiltersHref(sort)}
             class:list={['px-2 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline', focusRing]}
             data-testid="clear-filters"
         >

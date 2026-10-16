@@ -15,17 +15,17 @@ Ce ticket ne dépend que du Tri. Il vient pourtant après le 02 : ses tests couv
 
 ## Critères d'acceptation
 
-- [ ] Une fonction pure du module du Tri construit l'URL de « Clear filters » à partir du Tri retenu :
+- [x] Une fonction pure du module du Tri construit l'URL de « Clear filters » à partir du Tri retenu :
   - `/` au Tri par défaut (titre, croissant) ;
   - sinon `/?sortProperty=…&sortDirection=…`, avec les deux paramètres.
-- [ ] Les deux liens « Clear filters » tirent leur `href` de cette fonction :
+- [x] Les deux liens « Clear filters » tirent leur `href` de cette fonction :
   - celui du formulaire (`clear-filters`) ;
   - celui du message vide (`no-matching-games-clear-filters`).
-- [ ] Leurs `data-testid` ne changent pas.
-- [ ] Le fichier de test du module du Tri prouve, sans base de données, que la fonction rend `/` au Tri par défaut, et les deux paramètres pour chacun des trois autres Tris (titre décroissant, Note croissante, Note décroissante).
-- [ ] Les tests des tickets 01 et 02 passent sans changement.
-- [ ] On vérifie à la main, au clavier, sur `npm run dev` :
+- [x] Leurs `data-testid` ne changent pas.
+- [x] Le fichier de test du module du Tri prouve, sans base de données, que la fonction rend `/` au Tri par défaut, et les deux paramètres pour chacun des trois autres Tris (titre décroissant, Note croissante, Note décroissante).
+- [x] Les tests des tickets 01 et 02 passent sans changement.
+- [x] On vérifie à la main, au clavier, sur `npm run dev` :
   - trier par « Rating » et « Descending », choisir une Catégorie, appliquer, puis activer « Clear filters » : tout le Catalogue s'affiche, toujours par Note décroissante, et les deux listes déroulantes montrent ce Tri ;
   - même chose depuis le message vide, avec `?category=99999&sortProperty=rating&sortDirection=desc` ;
   - au Tri par défaut, « Clear filters » mène à `/`.
-- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+- [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
