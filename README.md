@@ -2,7 +2,7 @@
 
 Le projet d'entraînement de la formation Claude Code « Context Engineering, skills & workflows ». C'est un fork de [github-samples/tailspin-toys](https://github.com/github-samples/tailspin-toys), l'appli que GitHub utilise pour ses ateliers d'agents, adapté à Claude Code (voir [ce qui change](#ce-qui-change-par-rapport-à-loriginal)).
 
-Tailspin Toys est un site fictif de financement participatif de jeux : un catalogue de 21 jeux, une fiche par jeu et une page À propos. Il est écrit en TypeScript, avec [Astro](https://astro.build/) 7 et [Tailwind CSS](https://tailwindcss.com/) v4. Les données sont dans une base SQLite locale, lue avec [Drizzle ORM](https://orm.drizzle.team/) et le module SQLite intégré à Node. Il n'y a rien d'autre à installer que Node : ni serveur de base de données, ni Docker, ni clé d'API.
+Tailspin Toys est un site fictif de financement participatif de jeux : un catalogue de 21 jeux, une fiche par jeu et une page À propos. Il est écrit en TypeScript, avec [Astro](https://astro.build/) 7 et [Tailwind CSS](https://tailwindcss.com/) v4. Les données sont dans une base SQLite locale, lue avec [Drizzle ORM](https://orm.drizzle.team/) et le module SQLite intégré à Node. Il n'y a rien d'autre à installer que Node : ni serveur de base de données, ni Docker. Seul le Backer Concierge demande une clé d'API, facultative (voir [plus bas](#le-backer-concierge)).
 
 ## Prérequis
 
@@ -29,6 +29,14 @@ npm run dev
 Ouvrez l'URL affichée, http://localhost:4321 en général. `npm run dev` crée d'abord la base, `tailspin.db`, à partir de `db/games.csv`. Dans un deuxième worktree, le serveur prend le port libre suivant (4322, 4323…).
 
 Quand c'est Claude Code qui lance `npm run dev` sous macOS ou Linux, Astro 7 passe le serveur en arrière-plan et rend la main à Claude. Pour l'arrêter : `npx astro dev stop`.
+
+## Le Backer Concierge
+
+La page `/concierge` répond aux questions des Visiteurs avec l'API Claude, à partir du Catalogue. Elle a besoin d'une clé d'API : pendant la formation, c'est la clé que le formateur distribue, plafonnée en dépenses et révoquée après la session.
+
+Copiez `.env.example` en `.env`, à la racine (`.env` est ignoré par git), puis collez la clé après `ANTHROPIC_API_KEY=` et relancez `npm run dev`. La clé reste sur le serveur : elle n'entre ni dans le build ni dans le navigateur. Le Concierge n'utilise que la variable `ANTHROPIC_API_KEY`, jamais un profil `ant auth login` ni `ANTHROPIC_AUTH_TOKEN`. Attention : une variable `ANTHROPIC_API_KEY` exportée dans le terminal passe avant celle de `.env` ; si vous en avez une à vous, retirez-la avant de lancer le serveur, pour que le Concierge utilise bien la clé de formation.
+
+Sans clé, le reste du site marche, les tests passent, et le Concierge répond qu'il n'est pas configuré.
 
 ## Tester
 
