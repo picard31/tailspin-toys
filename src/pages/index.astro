@@ -12,22 +12,22 @@ const games = await getAllGames(getDatabase());
 ---
 
 <Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
-  <div class="py-8">
-    <PageHero
-      title="Welcome to Tailspin Toys"
-      subtitle="Find your next game! And maybe even back one! Explore our collection!"
-    />
+    <div class="py-8">
+        <PageHero
+            title="Welcome to Tailspin Toys"
+            subtitle="Find your next game! And maybe even back one! Explore our collection!"
+        />
 
-    <div>
-      <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
+        <div>
+            <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
 
-      {games.length === 0 ? (
-        <EmptyState text="No games available at the moment." />
-      ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
+            {games.length === 0 ? (
+                <EmptyState text="No games available at the moment." />
+            ) : (
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
+                    {games.map((game) => <GameCard game={game} />)}
+                </div>
+            )}
         </div>
-      )}
     </div>
-  </div>
 </Layout>

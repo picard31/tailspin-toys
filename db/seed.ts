@@ -50,7 +50,14 @@ async function upsertPublishers(db: Database, names: string[]): Promise<Map<stri
     return map;
 }
 
-/** Seed the database from the games CSV. Idempotent: skips existing games by title. */
+/**
+ * Seed the database from the games CSV. Idempotent: skips existing games by
+ * title, which is why a change to the CSV needs `tailspin.db` deleted first.
+ *
+ * @param db - Database to fill, injected so a test can seed an in-memory one.
+ * The CLI below passes `createDatabase()`.
+ * @param csvPath - CSV to read; defaults to `db/games.csv`.
+ */
 export async function seedDatabase(db: Database, csvPath: string = join(here, 'games.csv')): Promise<void> {
     const rows = parseGamesCsv(readFileSync(csvPath, 'utf-8'));
 

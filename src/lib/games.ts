@@ -42,6 +42,7 @@ function mapGame(row: GameSelectionRow): Game {
     };
 }
 
+// Left joins keep a game listed when its category or publisher row is missing: mapGame turns them into null.
 function baseGamesQuery(db: Database) {
     return db
         .select(gameSelection)
@@ -50,19 +51,35 @@ function baseGamesQuery(db: Database) {
         .leftJoin(publishers, eq(games.publisherId, publishers.id));
 }
 
-/** All games ordered by title. */
+/**
+ * Every game of the catalog, with its category and publisher.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @returns The games sorted by title, so two builds list them in the same order.
+ */
 export async function getAllGames(db: Database): Promise<Game[]> {
     const rows = await baseGamesQuery(db).orderBy(asc(games.title));
     return rows.map(mapGame);
 }
 
-/** All game ids ordered by title. */
+/**
+ * Every game id, for `getStaticPaths` to prerender one detail page per game.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @returns The ids, in the title order of `getAllGames`.
+ */
 export async function getAllGameIds(db: Database): Promise<number[]> {
     const rows = await db.select({ id: games.id }).from(games).orderBy(asc(games.title));
     return rows.map((row) => row.id);
 }
 
-/** A single game by id, or null when it does not exist. */
+/**
+ * A single game by id.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @param id - The game's primary key.
+ * @returns The game, or `null` when no game has this id.
+ */
 export async function getGameById(db: Database, id: number): Promise<Game | null> {
     const row = await baseGamesQuery(db).where(eq(games.id, id)).get();
     return row ? mapGame(row) : null;

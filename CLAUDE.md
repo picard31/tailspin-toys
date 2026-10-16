@@ -6,7 +6,7 @@ Site fictif de financement participatif de jeux, en Astro 7 et Tailwind CSS v4, 
 
 - `npm run dev` : serveur de dev, sur le premier port libre à partir de 4321 ; l'URL est dans la sortie. `npm run dev -- --port 4322` impose le port.
 - `npm run test:unit` : Vitest, en moins d'une seconde. Un seul fichier : `npx vitest run src/lib/games.test.ts`.
-- `npm run lint` : ESLint.
+- `npm run lint` : ESLint, qui vérifie aussi le format, les TSDoc de `db/` et `src/lib/` et les `Props` des composants. `npm run lint -- --fix` corrige le format.
 - `npm run typecheck` : TypeScript 7 (`tsgo`) sur `db/` et `src/lib/`.
 
 Une tâche est finie quand `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.

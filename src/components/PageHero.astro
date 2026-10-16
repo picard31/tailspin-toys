@@ -1,6 +1,9 @@
 ---
+/** Heading block at the top of a page; extra content goes in the default slot, under the subtitle. */
 interface Props {
+    /** Shown as the hero's `<h1>`. */
     title: string;
+    /** Line under the title; left out when not provided. */
     subtitle?: string;
 }
 
