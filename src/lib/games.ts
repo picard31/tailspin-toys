@@ -5,14 +5,21 @@ import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
 import { categoryCondition } from './category-filter';
+import { readCatalogSearch, searchCondition, clearSearchHref, clearFiltersHref } from './catalog-search';
 import { getCatalogSummary } from './catalog-summary';
 
-/** The home page catalog: the games kept by the filters, the size and average rating of the whole catalog, and the filters kept. */
+/**
+ * The home page catalog: the games kept by the filters and the search, the size and average rating of
+ * the whole catalog, the filters and search kept, and the URLs of the links that clear one or the other.
+ */
 export interface Catalog {
     games: Game[];
     total: number;
     averageRating: number | null;
     filters: CatalogFilters;
+    search: string | null;
+    clearSearchHref: string;
+    clearFiltersHref: string;
 }
 
 const gameSelection = {
@@ -98,15 +105,17 @@ export async function getGameById(db: Database, id: number): Promise<Game | null
 }
 
 /**
- * The games of the filtered catalog: each filter family adds its condition, joined with AND.
+ * The games of the filtered catalog: each filter family and the search add their condition, joined
+ * with AND.
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param filters - The filters kept from the URL.
- * @returns The matching games sorted by title; every game when no filter is active.
+ * @param search - The search kept from the URL, or `null` when there is none.
+ * @returns The matching games sorted by title; every game when neither a filter nor a search is active.
  */
-export async function getCatalogGames(db: Database, filters: CatalogFilters): Promise<Game[]> {
+export async function getCatalogGames(db: Database, filters: CatalogFilters, search: string | null): Promise<Game[]> {
     const rows = await baseGamesQuery(db)
-        .where(and(categoryCondition(filters.categoryIds)))
+        .where(and(categoryCondition(filters.categoryIds), searchCondition(search)))
         .orderBy(asc(games.title));
     return rows.map(mapGame);
 }
@@ -118,13 +127,23 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters): Pr
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.
  * @returns The matching games sorted by title, the size and the average rating of the whole catalog
- *   (`getCatalogSummary`, whatever the filters), and the filters kept.
+ *   (`getCatalogSummary`, whatever the filters and the search), the filters and search kept, and the
+ *   URLs that clear the search (keeping the rest) or the filters (keeping the search).
  */
 export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
     const filters = readCatalogFilters(searchParams);
-    const catalogGames = await getCatalogGames(db, filters);
+    const search = readCatalogSearch(searchParams);
+    const catalogGames = await getCatalogGames(db, filters, search);
     const { total, averageRating } = await getCatalogSummary(db);
-    return { games: catalogGames, total, averageRating, filters };
+    return {
+        games: catalogGames,
+        total,
+        averageRating,
+        filters,
+        search,
+        clearSearchHref: clearSearchHref(searchParams),
+        clearFiltersHref: clearFiltersHref(search),
+    };
 }
 
 /** Case-insensitive substring test; `instr` has no wildcards, so `%` and `_` match themselves. */
