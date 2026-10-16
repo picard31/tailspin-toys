@@ -15,6 +15,32 @@ export function readCatalogSearch(searchParams: URLSearchParams): string | null 
 }
 
 /**
+ * The home page URL without the search, for the "Clear search" links. It drops what it knows and
+ * keeps the rest as it came, so the category, and any parameter a later feature adds, survive
+ * without this function knowing them.
+ *
+ * @param searchParams - The home page's raw URL parameters.
+ * @returns `/?` and the current parameters, less every `search` value and less the empty ones a GET
+ *   form sends for a blank control; `/` when nothing is left.
+ */
+export function clearSearchHref(searchParams: URLSearchParams): string {
+    const kept = new URLSearchParams([...searchParams].filter(([name, value]) => name !== 'search' && value !== ''));
+    return kept.size === 0 ? '/' : `/?${kept}`;
+}
+
+/**
+ * The home page URL without the filters, for the "Clear filters" links. A search is not a filter,
+ * so it is the one parameter kept.
+ *
+ * @param search - The search kept from the URL.
+ * @returns `/` when there is no search, otherwise `/?search=` and the search kept, encoded as a GET
+ *   form does it (`/?search=server+sim`).
+ */
+export function clearFiltersHref(search: string | null): string {
+    return search === null ? '/' : `/?${new URLSearchParams({ search })}`;
+}
+
+/**
  * The search's condition, which `getCatalogGames` joins to the filters' conditions with AND.
  *
  * @param search - The search kept from the URL.

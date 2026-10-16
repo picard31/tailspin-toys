@@ -5,11 +5,15 @@ import CategoryFilter from './CategoryFilter.astro';
 interface Props {
     /** The filters kept from the URL, shown as the current state of each filter control. */
     filters: CatalogFilters;
-    /** The search kept from the URL, which prefills the search field; `null` leaves it empty. */
+    /** The search kept from the URL, which prefills the search field; `null` leaves it empty and hides "Clear search". */
     search: string | null;
+    /** Target of the "Clear search" link next to the field, which keeps the filters. */
+    clearSearchHref: string;
+    /** Target of the "Clear filters" link, which keeps the search. */
+    clearFiltersHref: string;
 }
 
-const { filters, search } = Astro.props;
+const { filters, search, clearSearchHref, clearFiltersHref } = Astro.props;
 
 const focusRing =
     'focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800';
@@ -24,14 +28,25 @@ const focusRing =
     {/* No button of its own: Enter submits the whole form, so the search and the filters apply together. */}
     <div>
         <label for="catalog-search" class="block text-sm font-medium text-slate-100 mb-3">Search by title</label>
-        <input
-            id="catalog-search"
-            type="search"
-            name="search"
-            value={search}
-            class:list={['w-full sm:max-w-sm px-3 py-2 rounded-lg bg-slate-900 border border-slate-500 text-sm text-slate-100', focusRing]}
-            data-testid="search-input"
-        />
+        <div class="flex flex-wrap items-center gap-4">
+            <input
+                id="catalog-search"
+                type="search"
+                name="search"
+                value={search}
+                class:list={['w-full sm:max-w-sm px-3 py-2 rounded-lg bg-slate-900 border border-slate-500 text-sm text-slate-100', focusRing]}
+                data-testid="search-input"
+            />
+            {search !== null && (
+                <a
+                    href={clearSearchHref}
+                    class:list={['px-2 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline', focusRing]}
+                    data-testid="clear-search"
+                >
+                    Clear search
+                </a>
+            )}
+        </div>
     </div>
 
     <CategoryFilter selectedIds={filters.categoryIds} />
@@ -45,7 +60,7 @@ const focusRing =
             Apply
         </button>
         <a
-            href="/"
+            href={clearFiltersHref}
             class:list={['px-2 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline', focusRing]}
             data-testid="clear-filters"
         >

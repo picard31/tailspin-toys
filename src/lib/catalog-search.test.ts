@@ -191,6 +191,68 @@ describe('catalog searched by title', () => {
     });
 });
 
+describe('links that clear the search or the filters', () => {
+    let db: Database;
+    let seeded: SeededCatalog;
+
+    beforeEach(async () => {
+        db = await createTestDatabase();
+        seeded = await seedCatalog(db);
+    });
+
+    it('drops every search value from the clear search link', async () => {
+        const catalog = await getCatalog(db, params(`search=siege&category=${seeded.strategyId}&search=quest`));
+        expect(catalog.clearSearchHref).toBe(`/?category=${seeded.strategyId}`);
+    });
+
+    it('keeps the chosen categories in the clear search link', async () => {
+        const catalog = await getCatalog(
+            db,
+            params(`category=${seeded.strategyId}&search=server&category=${seeded.puzzleId}`),
+        );
+        expect(catalog.clearSearchHref).toBe(`/?category=${seeded.strategyId}&category=${seeded.puzzleId}`);
+    });
+
+    it('keeps the parameters of other features in the clear search link, untouched', async () => {
+        const catalog = await getCatalog(db, params('search=server&sortProperty=rating&sortDirection=desc'));
+        expect(catalog.clearSearchHref).toBe('/?sortProperty=rating&sortDirection=desc');
+    });
+
+    it('drops the empty parameters from the clear search link', async () => {
+        const catalog = await getCatalog(db, params(`search=server&category=&category=${seeded.strategyId}&publisher=`));
+        expect(catalog.clearSearchHref).toBe(`/?category=${seeded.strategyId}`);
+    });
+
+    it.each([
+        ['only a search', 'search=server'],
+        ['a search and empty parameters', 'search=siege&category=&search=quest'],
+    ])('points the clear search link to the home page when nothing is left of %s', async (_label, query) => {
+        const catalog = await getCatalog(db, params(query));
+        expect(catalog.clearSearchHref).toBe('/');
+    });
+
+    it.each([
+        ['no search parameter', ''],
+        ['a blank search', 'search=++'],
+    ])('points the clear filters link to the home page with %s', async (_label, query) => {
+        const searchParams = params(query);
+        searchParams.append('category', String(seeded.strategyId));
+        const catalog = await getCatalog(db, searchParams);
+        expect(catalog.clearFiltersHref).toBe('/');
+    });
+
+    it.each([
+        ['a space', 'search=server+sim', '/?search=server+sim'],
+        ['an ampersand', 'search=R%26D', '/?search=R%26D'],
+        ['spaces around it, then a second value', 'search=++server+sim++&search=quest', '/?search=server+sim'],
+    ])('keeps the search kept, encoded, in the clear filters link: a search with %s', async (_label, query, href) => {
+        const searchParams = params(query);
+        searchParams.append('category', String(seeded.strategyId));
+        const catalog = await getCatalog(db, searchParams);
+        expect(catalog.clearFiltersHref).toBe(href);
+    });
+});
+
 describe('catalog searched without games', () => {
     it('returns no games and a total of zero when the catalog is empty', async () => {
         const db = await createTestDatabase();

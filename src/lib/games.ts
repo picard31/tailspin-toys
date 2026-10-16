@@ -4,14 +4,19 @@ import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
 import { categoryCondition } from './category-filter';
-import { readCatalogSearch, searchCondition } from './catalog-search';
+import { readCatalogSearch, searchCondition, clearSearchHref, clearFiltersHref } from './catalog-search';
 
-/** The home page catalog: the games kept by the filters and the search, the catalog size, and the filters and search kept. */
+/**
+ * The home page catalog: the games kept by the filters and the search, the catalog size, the filters
+ * and search kept, and the URLs of the links that clear one or the other.
+ */
 export interface Catalog {
     games: Game[];
     total: number;
     filters: CatalogFilters;
     search: string | null;
+    clearSearchHref: string;
+    clearFiltersHref: string;
 }
 
 const gameSelection = {
@@ -117,13 +122,20 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters, sea
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.
- * @returns The matching games sorted by title, the size of the whole catalog, and the filters and
- *   search kept.
+ * @returns The matching games sorted by title, the size of the whole catalog, the filters and search
+ *   kept, and the URLs that clear the search (keeping the rest) or the filters (keeping the search).
  */
 export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
     const filters = readCatalogFilters(searchParams);
     const search = readCatalogSearch(searchParams);
     const catalogGames = await getCatalogGames(db, filters, search);
     const [{ total }] = await db.select({ total: count() }).from(games);
-    return { games: catalogGames, total, filters, search };
+    return {
+        games: catalogGames,
+        total,
+        filters,
+        search,
+        clearSearchHref: clearSearchHref(searchParams),
+        clearFiltersHref: clearFiltersHref(search),
+    };
 }
