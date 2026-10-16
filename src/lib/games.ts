@@ -1,7 +1,16 @@
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, and, count } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
+import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
+import { categoryCondition } from './category-filter';
+
+/** The home page catalog: the games kept by the filters, the catalog size and the filters kept. */
+export interface Catalog {
+    games: Game[];
+    total: number;
+    filters: CatalogFilters;
+}
 
 const gameSelection = {
     id: games.id,
@@ -83,4 +92,32 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 export async function getGameById(db: Database, id: number): Promise<Game | null> {
     const row = await baseGamesQuery(db).where(eq(games.id, id)).get();
     return row ? mapGame(row) : null;
+}
+
+/**
+ * The games of the filtered catalog: each filter family adds its condition, joined with AND.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @param filters - The filters kept from the URL.
+ * @returns The matching games sorted by title; every game when no filter is active.
+ */
+export async function getCatalogGames(db: Database, filters: CatalogFilters): Promise<Game[]> {
+    const rows = await baseGamesQuery(db)
+        .where(and(categoryCondition(filters.categoryIds)))
+        .orderBy(asc(games.title));
+    return rows.map(mapGame);
+}
+
+/**
+ * The home page catalog, the only call the page makes: invalid URL values are ignored, never an error.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @param searchParams - The home page's raw URL parameters.
+ * @returns The matching games sorted by title, the size of the whole catalog, and the filters kept.
+ */
+export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
+    const filters = readCatalogFilters(searchParams);
+    const catalogGames = await getCatalogGames(db, filters);
+    const [{ total }] = await db.select({ total: count() }).from(games);
+    return { games: catalogGames, total, filters };
 }
