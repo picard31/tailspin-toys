@@ -1,14 +1,16 @@
-import { eq, asc, and, count } from 'drizzle-orm';
+import { eq, asc, and } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
 import { categoryCondition } from './category-filter';
+import { getCatalogSummary } from './catalog-summary';
 
-/** The home page catalog: the games kept by the filters, the catalog size and the filters kept. */
+/** The home page catalog: the games kept by the filters, the size and average rating of the whole catalog, and the filters kept. */
 export interface Catalog {
     games: Game[];
     total: number;
+    averageRating: number | null;
     filters: CatalogFilters;
 }
 
@@ -113,11 +115,12 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters): Pr
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.
- * @returns The matching games sorted by title, the size of the whole catalog, and the filters kept.
+ * @returns The matching games sorted by title, the size and the average rating of the whole catalog
+ *   (`getCatalogSummary`, whatever the filters), and the filters kept.
  */
 export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
     const filters = readCatalogFilters(searchParams);
     const catalogGames = await getCatalogGames(db, filters);
-    const [{ total }] = await db.select({ total: count() }).from(games);
-    return { games: catalogGames, total, filters };
+    const { total, averageRating } = await getCatalogSummary(db);
+    return { games: catalogGames, total, averageRating, filters };
 }
