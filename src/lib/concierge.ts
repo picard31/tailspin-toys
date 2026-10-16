@@ -113,19 +113,26 @@ interface ModelOutput {
     gameIds: number[];
 }
 
-/** The model's answer and game ids, read from its raw structured output, or null when it has no answer. */
-function readModelOutput(output: string): ModelOutput | null {
-    let parsed: { answer?: unknown; gameIds?: unknown };
+/** Why the model may stop without a usable answer: it declined, or ran out of tokens mid-answer. */
+const UNUSABLE_STOP_REASONS = new Set(['refusal', 'max_tokens']);
+
+/** The model's reply when it follows the output schema, or null when it does not. */
+function readModelOutput(reply: ModelReply): ModelOutput | null {
+    if (reply.stopReason !== null && UNUSABLE_STOP_REASONS.has(reply.stopReason)) {
+        return null;
+    }
+
+    let parsed: { answer?: unknown; gameIds?: unknown } | null;
     try {
-        parsed = JSON.parse(output) as { answer?: unknown; gameIds?: unknown };
+        parsed = JSON.parse(reply.output) as { answer?: unknown; gameIds?: unknown } | null;
     } catch {
         return null;
     }
-    if (typeof parsed?.answer !== 'string') {
+    const { answer, gameIds } = parsed ?? {};
+    if (typeof answer !== 'string' || !Array.isArray(gameIds) || !gameIds.every(Number.isInteger)) {
         return null;
     }
-    const gameIds = Array.isArray(parsed.gameIds) ? parsed.gameIds.filter(Number.isInteger) : [];
-    return { answer: parsed.answer, gameIds };
+    return { answer, gameIds };
 }
 
 /** The catalog games the model recommends: unknown ids dropped, duplicates merged, the model's order kept. */
@@ -160,7 +167,7 @@ export async function answerConcierge(
         return { status: 502, body: { error: MODEL_FAILED } };
     }
 
-    const output = readModelOutput(reply.output);
+    const output = readModelOutput(reply);
     if (output === null) {
         return { status: 502, body: { error: MODEL_FAILED } };
     }

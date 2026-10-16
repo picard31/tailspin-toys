@@ -241,4 +241,21 @@ describe('answerConcierge', () => {
         expect(result.status).toBe(502);
         expect(result.body).toEqual({ error: expect.any(String) });
     });
+
+    it.each<[string, ModelReply]>([
+        ['the model refuses to answer', { stopReason: 'refusal', output: '{"answer": "No.", "gameIds": []}' }],
+        ['the model stops on the token limit', { stopReason: 'max_tokens', output: '{"answer": "Try", "gameIds": []}' }],
+        ['the output is not JSON', { stopReason: 'end_turn', output: 'Try Pipeline Conquest.' }],
+        ['the output has no answer', { stopReason: 'end_turn', output: '{"gameIds": []}' }],
+        ['the answer is not text', { stopReason: 'end_turn', output: '{"answer": 42, "gameIds": []}' }],
+        ['gameIds is missing', { stopReason: 'end_turn', output: '{"answer": "Try these."}' }],
+        ['gameIds is not a list', { stopReason: 'end_turn', output: '{"answer": "Try these.", "gameIds": 1}' }],
+        ['gameIds holds a decimal', { stopReason: 'end_turn', output: '{"answer": "Try these.", "gameIds": [1.5]}' }],
+        ['gameIds holds a string', { stopReason: 'end_turn', output: '{"answer": "Try these.", "gameIds": ["1"]}' }],
+    ])('returns 502, inviting to try again, when %s', async (_label, reply) => {
+        const { askModel } = fakeAskModel(reply);
+        const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(502);
+        expect(result.body).toEqual({ error: expect.stringMatching(/try again/i) });
+    });
 });
