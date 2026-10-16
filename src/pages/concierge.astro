@@ -62,8 +62,19 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
 </Layout>
 
 <script>
+  /** A recommended game, as the catalog export describes it. */
+  interface RecommendedGame {
+    id: number;
+    title: string;
+    category: string;
+    publisher: string;
+    starRating?: number;
+    ratingLabel: string;
+  }
+
   interface ConciergeReply {
     answer?: unknown;
+    games?: unknown;
     error?: unknown;
   }
 
@@ -90,6 +101,30 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
     }
     block.append(heading, body);
     return block;
+  }
+
+  /** The recommendations under an answer: a link to each game's page, with its category, publisher and rating. */
+  function recommendationList(games: RecommendedGame[]): HTMLElement {
+    const list = document.createElement('ul');
+    list.className = 'mt-3 space-y-2';
+    list.setAttribute('aria-label', 'Recommended games');
+    for (const game of games) {
+      const item = document.createElement('li');
+      item.className = 'p-3 rounded-lg bg-slate-800/60 border border-slate-700/50';
+      item.dataset.testid = 'concierge-game';
+      const link = document.createElement('a');
+      link.href = `/game/${game.id}`;
+      link.className =
+        'font-semibold text-blue-400 hover:text-blue-300 hover:underline rounded focus:outline-none focus:ring-2 focus:ring-blue-500';
+      link.textContent = game.title;
+      const rating = game.starRating === undefined ? game.ratingLabel : `${game.ratingLabel} ${game.starRating.toFixed(1)}`;
+      const details = document.createElement('p');
+      details.className = 'text-sm text-slate-400';
+      details.textContent = `${game.category} · ${game.publisher} · ${rating}`;
+      item.append(link, details);
+      list.append(item);
+    }
+    return list;
   }
 
   /** Send the question to the route; a network failure reads as an error reply. */
@@ -124,7 +159,12 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
       const { ok, reply } = await askConcierge(question);
 
       if (ok && typeof reply.answer === 'string') {
-        log.append(entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer'));
+        const answer = entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer');
+        const games = Array.isArray(reply.games) ? (reply.games as RecommendedGame[]) : [];
+        if (games.length > 0) {
+          answer.append(recommendationList(games));
+        }
+        log.append(answer);
         field.value = '';
       } else {
         const message = typeof reply.error === 'string' ? reply.error : UNREACHABLE;

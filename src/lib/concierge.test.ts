@@ -2,7 +2,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestDatabase } from '../../db/test-helpers';
 import { categories, publishers, games } from '../../db/schema';
 import type { Database } from './db';
-import { answerConcierge, type AskModel, type ConciergeMessage, type ModelReply } from './concierge';
+import {
+    answerConcierge,
+    type AskModel,
+    type ConciergeMessage,
+    type ConciergeResult,
+    type ModelReply,
+} from './concierge';
+import { formatStarRating } from './ratings';
 
 const API_KEY = 'test-key';
 
@@ -70,6 +77,12 @@ function answerReply(answer: string, gameIds: number[] = []): ModelReply {
 
 function question(content: string): string {
     return JSON.stringify({ messages: [{ role: 'user', content }] });
+}
+
+/** The titles of the recommended games of a 200 result. */
+function recommendedTitles(result: ConciergeResult): string[] {
+    expect(result.status).toBe(200);
+    return result.status === 200 ? result.body.games.map((game) => game.title) : [];
 }
 
 describe('answerConcierge', () => {
@@ -164,6 +177,62 @@ describe('answerConcierge', () => {
         const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
         expect(result.status).toBe(200);
         expect(result.body).toEqual({ answer: 'Git Gud is full of git puns.', games: [] });
+    });
+
+    it('describes the recommendations as the database does, whatever the model output claims', async () => {
+        const [pipeline] = seeded;
+        const { askModel } = fakeAskModel({
+            stopReason: 'end_turn',
+            output: JSON.stringify({
+                answer: 'Pipeline Conquest, a 5-star Puzzle game by Hasbro.',
+                gameIds: [pipeline.id],
+                games: [{ id: pipeline.id, title: 'Invented', category: 'Puzzle', publisher: 'Hasbro', starRating: 5 }],
+            }),
+        });
+        const result = await answerConcierge(db, question('Which strategy game?'), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+        expect(result.body).toEqual({
+            answer: 'Pipeline Conquest, a 5-star Puzzle game by Hasbro.',
+            games: [
+                {
+                    id: pipeline.id,
+                    title: 'Pipeline Conquest',
+                    description: 'About Pipeline Conquest',
+                    category: 'Strategy',
+                    publisher: 'CodeForge Studios',
+                    starRating: 4.5,
+                    ratingLabel: formatStarRating(4.5),
+                },
+            ],
+        });
+    });
+
+    it('drops the game ids that are not in the catalog', async () => {
+        const [pipeline] = seeded;
+        const { askModel } = fakeAskModel(answerReply('Try these.', [99999, pipeline.id]));
+        const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
+        expect(recommendedTitles(result)).toEqual(['Pipeline Conquest']);
+    });
+
+    it('merges duplicate game ids', async () => {
+        const [pipeline, merge] = seeded;
+        const { askModel } = fakeAskModel(answerReply('Try these.', [merge.id, pipeline.id, merge.id]));
+        const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
+        expect(recommendedTitles(result)).toEqual(['Merge Conflict Mystery', 'Pipeline Conquest']);
+    });
+
+    it("keeps the model's order", async () => {
+        const [pipeline, merge, gitGud] = seeded;
+        const { askModel } = fakeAskModel(answerReply('Try these.', [gitGud.id, pipeline.id, merge.id]));
+        const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
+        expect(recommendedTitles(result)).toEqual(['Git Gud', 'Pipeline Conquest', 'Merge Conflict Mystery']);
+    });
+
+    it('returns no recommendation for an empty gameIds', async () => {
+        const { askModel } = fakeAskModel(answerReply('Which genre do you like?', []));
+        const result = await answerConcierge(db, question('Recommend me a good game'), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+        expect(recommendedTitles(result)).toEqual([]);
     });
 
     it('returns 502 when the model call fails', async () => {

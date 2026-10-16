@@ -108,14 +108,30 @@ function readConversation(body: string): ReadResult {
     return { messages: [{ role, content }] };
 }
 
-/** The model's answer, read from its raw structured output, or null when it has none. */
-function readAnswer(output: string): string | null {
+interface ModelOutput {
+    answer: string;
+    gameIds: number[];
+}
+
+/** The model's answer and game ids, read from its raw structured output, or null when it has no answer. */
+function readModelOutput(output: string): ModelOutput | null {
+    let parsed: { answer?: unknown; gameIds?: unknown };
     try {
-        const { answer } = JSON.parse(output) as { answer?: unknown };
-        return typeof answer === 'string' ? answer : null;
+        parsed = JSON.parse(output) as { answer?: unknown; gameIds?: unknown };
     } catch {
         return null;
     }
+    if (typeof parsed?.answer !== 'string') {
+        return null;
+    }
+    const gameIds = Array.isArray(parsed.gameIds) ? parsed.gameIds.filter(Number.isInteger) : [];
+    return { answer: parsed.answer, gameIds };
+}
+
+/** The catalog games the model recommends: unknown ids dropped, duplicates merged, the model's order kept. */
+function recommendedGames(catalog: CatalogExport, gameIds: number[]): CatalogGame[] {
+    const byId = new Map(catalog.games.map((game) => [game.id, game]));
+    return [...new Set(gameIds)].flatMap((id) => byId.get(id) ?? []);
 }
 
 /**
@@ -144,10 +160,10 @@ export async function answerConcierge(
         return { status: 502, body: { error: MODEL_FAILED } };
     }
 
-    const answer = readAnswer(reply.output);
-    if (answer === null) {
+    const output = readModelOutput(reply.output);
+    if (output === null) {
         return { status: 502, body: { error: MODEL_FAILED } };
     }
 
-    return { status: 200, body: { answer, games: [] } };
+    return { status: 200, body: { answer: output.answer, games: recommendedGames(catalog, output.gameIds) } };
 }
