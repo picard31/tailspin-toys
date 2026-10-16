@@ -20,9 +20,17 @@ _À éviter_ : genre, type, tag
 La société qui publie un Jeu.
 _À éviter_ : studio, développeur, publisher (dans les docs en français)
 
+**Note** :
+L'appréciation d'un Jeu, de 0 à 5 étoiles. Un Jeu peut ne pas encore avoir de Note.
+_À éviter_ : évaluation, score, étoiles, rating (dans les docs en français)
+
 **Filtre** :
 Un critère qui restreint le Catalogue affiché selon une propriété du Jeu. Chaque famille de filtres porte sur une seule propriété : la Catégorie ou l'Éditeur.
 _À éviter_ : facette, recherche (la recherche porte sur le titre, ticket 01)
+
+**Tri** :
+L'ordre dans lequel le Catalogue affiché est présenté, selon une propriété du Jeu (son titre ou sa Note) et un sens, croissant ou décroissant. Contrairement à un Filtre, il ne retire aucun Jeu.
+_À éviter_ : classement, ordre d'affichage, filtre
 
 **Visiteur** :
 Une personne qui parcourt le Catalogue. Elle reste anonyme : la plateforme ne garde trace ni d'elle, ni des Jeux qu'elle soutient.
