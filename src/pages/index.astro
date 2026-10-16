@@ -8,13 +8,24 @@ import { getDatabase } from '../lib/db';
 import { getCatalog } from '../lib/games';
 import { hasActiveFilters } from '../lib/catalog-filters';
 
-// Rendered on demand: the filters are read from the query string (ADR 0001).
+// Rendered on demand: the filters and the search are read from the query string (ADR 0001).
 export const prerender = false;
 
-const { games, total, averageRating, filters } = await getCatalog(getDatabase(), Astro.url.searchParams);
-const title = hasActiveFilters(filters)
-    ? 'Filtered games - Tailspin Toys'
-    : 'Tailspin Toys - Crowdfunding your new favorite game!';
+const { games, total, averageRating, filters, search } = await getCatalog(getDatabase(), Astro.url.searchParams);
+const filtered = hasActiveFilters(filters);
+
+// The search wins over the filters: it is what the visitor typed, so it says best why the list is short.
+const title = search !== null
+    ? `Search results for "${search}" - Tailspin Toys`
+    : filtered
+        ? 'Filtered games - Tailspin Toys'
+        : 'Tailspin Toys - Crowdfunding your new favorite game!';
+
+const noMatchMessage = search === null
+    ? 'No games match these filters.'
+    : filtered
+        ? `No games match "${search}" with these filters.`
+        : `No games match "${search}".`;
 ---
 
 <Layout title={title}>
@@ -42,7 +53,7 @@ const title = hasActiveFilters(filters)
         <div>
             <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
 
-            <CatalogFilters filters={filters} />
+            <CatalogFilters filters={filters} search={search} />
 
             <p class="mb-6 text-sm text-slate-400" data-testid="results-count">
                 Showing {games.length} of {total} games
@@ -52,7 +63,7 @@ const title = hasActiveFilters(filters)
                 <EmptyState text="No games available at the moment." />
             ) : games.length === 0 ? (
                 <EmptyState>
-                    <p data-testid="no-matching-games" class="text-slate-300">No games match these filters.</p>
+                    <p data-testid="no-matching-games" class="text-slate-300">{noMatchMessage}</p>
                     <a
                         href="/"
                         class="inline-block mt-3 px-2 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800"
