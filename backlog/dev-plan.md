@@ -10,7 +10,7 @@ Deux tickets peuvent avancer en parallèle quand ils ne touchent pas les mêmes 
 |---|---|---|
 | [01 Recherche](01-search-games.md) | `src/pages/index.astro`, une condition dans `getCatalogGames` (`src/lib/games.ts`), un contrôle dans `CatalogFilters.astro` | Accueil |
 | [02 Tri](02-sort-games.md) | `src/pages/index.astro`, un contrôle de tri dans le formulaire (`CatalogFilters.astro`), un helper de tri de `src/lib/` et le `orderBy` de `getCatalogGames` (`src/lib/games.ts`) | Accueil |
-| [05 Résumé du catalogue](05-catalog-summary.md) | `src/pages/index.astro`, un helper de `src/lib/` | Accueil |
+| [05 Résumé du catalogue](05-catalog-summary.md) | `src/pages/index.astro`, un helper de `src/lib/`, un champ de `Catalog` et du `return` de `getCatalog` (`src/lib/games.ts`) | Accueil |
 | [06 Pagination](06-pagination.md) | `src/pages/index.astro`, `src/lib/games.ts` | Accueil |
 | [07 Filtres](07-filter-games.md) | `src/pages/index.astro`, `src/lib/games.ts`, de nouveaux composants | Accueil |
 | [03 Descriptions](03-detail-descriptions.md) | un nouveau module `src/lib/game-details.ts` (`getGameDetails`), `src/types/game.ts` (`GameDetails`), `src/pages/game/[id].astro` | Fiche de jeu |
@@ -52,7 +52,7 @@ Les dépendances, une par ligne :
 
 ## Fusionner la vague 2
 
-01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, dont 02 modifie le `orderBy`, et tous trois ajoutent un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et mettre les autres à jour avec `picard31/main` après chaque fusion.
+01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, dont 02 modifie le `orderBy`, et tous trois ajoutent un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie. 01 et 02 ajoutent aussi un paramètre à `getCatalogGames`, un champ à `Catalog` et au `return` de `getCatalog` (comme le 05 l'a fait), et une prop à `CatalogFilters`. Leurs conflits portent donc sur plusieurs blocs de `src/lib/games.ts`, `src/pages/index.astro` et `CatalogFilters.astro`. Ils se règlent à la main en gardant les ajouts des deux côtés, avec une seule signature de `getCatalogGames` qui réunit les paramètres de chacun. Fusionner les branches une à une, et mettre les autres à jour avec `picard31/main` après chaque fusion.
 
 Chaque ticket qui ajoute un terme du domaine l'écrit dans `GLOSSARY.md`, seul conflit de la vague 1. Placer chaque terme à côté de ses voisins de sens, plutôt qu'à la fin du fichier où toutes les branches écriraient au même endroit, réduit les conflits sans les exclure. Un conflit restant se règle à la main : garder les entrées des deux côtés, et une seule fois une entrée identique des deux côtés.
 
@@ -67,4 +67,4 @@ Chaque ticket qui ajoute un terme du domaine l'écrit dans `GLOSSARY.md`, seul c
   - 03 : `.scratch/descriptions-fiche-de-jeu/issues/01-descriptions.md` ;
   - 09 : les neuf tickets de `.scratch/backer-concierge/issues/`, de `01-la-page.md` à `09-la-question-de-clarification.md`, dans l'ordre des numéros.
 
-  Les tickets des vagues suivantes, sauf ceux du 07, sont encore dans `backlog/`, sans ligne `Status:`.
+  Les tickets des vagues suivantes, sauf ceux du 07 et du 05 (`.scratch/resume-du-catalogue/`), sont encore dans `backlog/`, sans ligne `Status:`.
