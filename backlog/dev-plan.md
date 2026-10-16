@@ -8,13 +8,13 @@ Deux tickets peuvent avancer en parallèle quand ils ne touchent pas les mêmes 
 
 | Ticket | Fichiers principaux | Zone |
 |---|---|---|
-| [01 Recherche](01-search-games.md) | `src/pages/index.astro`, un helper de `src/lib/` | Accueil |
-| [02 Tri](02-sort-games.md) | `src/pages/index.astro`, un helper de `src/lib/` | Accueil |
+| [01 Recherche](01-search-games.md) | `src/pages/index.astro`, une condition dans `getCatalogGames` (`src/lib/games.ts`), un contrôle dans `CatalogFilters.astro` | Accueil |
+| [02 Tri](02-sort-games.md) | `src/pages/index.astro`, le `orderBy` de `getCatalogGames` (`src/lib/games.ts`) | Accueil |
 | [05 Résumé du catalogue](05-catalog-summary.md) | `src/pages/index.astro`, un helper de `src/lib/` | Accueil |
 | [06 Pagination](06-pagination.md) | `src/pages/index.astro`, `src/lib/games.ts` | Accueil |
 | [07 Filtres](07-filter-games.md) | `src/pages/index.astro`, `src/lib/games.ts`, de nouveaux composants | Accueil |
 | [03 Descriptions](03-detail-descriptions.md) | un nouveau module `src/lib/game-details.ts` (`getGameDetails`), `src/types/game.ts` (`GameDetails`), `src/pages/game/[id].astro` | Fiche de jeu |
-| [04 Pages éditeur](04-publisher-pages.md) | `src/types/game.ts` (`PublisherDetails`), `src/pages/game/[id].astro`, une nouvelle page `src/pages/publisher/[id].astro` | Fiche de jeu |
+| [04 Pages éditeur](04-publisher-pages.md) | `src/pages/game/[id].astro` (un lien dans « About the publisher »), une nouvelle page `src/pages/publisher/[id].astro` ; il réutilise `GameDetails` et `PublisherDetails`, livrés par le 03 | Fiche de jeu |
 | [09 Backer Concierge](09-backer-concierge.md) | une nouvelle page `src/pages/concierge.astro`, une route `src/pages/api/concierge.ts`, un nouveau module `src/lib/concierge.ts`, `src/components/Header.astro`, `astro.config.mjs`, `package.json`, `README.md`, `.env.example` | Concierge |
 | [08 Standards de code](08-coding-standards.md) | `CLAUDE.md`, `.claude/rules/`, `eslint.config.js`, `README.md`, et potentiellement tous les fichiers | Transverse |
 
@@ -29,7 +29,7 @@ Le ticket 07 se découpe lui-même en quatre tranches (voir sa section *Delivery
 | 2 | **07.2** · **07.3** · **01** · **02** · **05** · **04** | 07.1 fusionnée ; 03 fusionné pour 04 | Débloquée |
 | 3 | **07.4** · **06** | 07.2, 07.3, 01 et 02 fusionnés | En attente |
 
-La vague 0 a livré les standards de code (spec `.scratch/standards-de-code/spec.md`, ADR 0002) : `npm run lint` impose désormais le format et la présence des TSDoc et des commentaires de Props. Une branche ouverte avant sa fusion se met à jour avec `main` par une fusion de `picard31/main` : un rebase réécrirait des commits déjà poussés. Ses conflits viennent surtout du reformatage, et `npm run lint -- --fix` remet ensuite son code au format.
+La vague 0 a livré les standards de code (spec `.scratch/standards-de-code/spec.md`, ADR 0002) : `npm run lint` impose désormais le format, la présence des TSDoc des fonctions exportées de `db/` et `src/lib/`, et celle des commentaires de Props. Une branche ouverte avant sa fusion se met à jour avec `main` par une fusion de `picard31/main` : un rebase réécrirait des commits déjà poussés. Ses conflits viennent surtout du reformatage. `npm run lint -- --fix` remet ensuite son code au format, sauf la base d'indentation des `<script>` des `.astro` et les TSDoc manquants, à écrire à la main (`.claude/rules/format.md`).
 
 La vague 1 a livré le filtre du Catalogue par une Catégorie (07.1, ADR 0001), les descriptions de la fiche de jeu (03) et le Backer Concierge (09, ADR 0003). Chaque PR a été relue par un agent dédié, puis fusionnée dans l'ordre 03, 09, puis 07.1. Les PR du 03 et de la 07.1 ont été approuvées avant leur fusion. Celle du 09 a été fusionnée avant la fin de sa revue : les corrections de son second tour arrivent par la PR #7, avec deux commentaires que la revue de la 07.1 jugeait non bloquants. Entre elles, un seul conflit : `GLOSSARY.md`, complété des deux côtés, réglé en gardant la version la plus complète. Les vérifications du Concierge qui demandent une vraie clé d'API restent à faire : elles sont notées sous `## Comments` dans ses tickets.
 
@@ -52,7 +52,9 @@ Les dépendances, une par ligne :
 
 ## Fusionner la vague 2
 
-01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, et un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie ; 02 modifie le `orderBy` de la même fonction. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et mettre les autres à jour avec `main` après chaque fusion.
+01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, et un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie ; 02 modifie le `orderBy` de la même fonction. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et mettre les autres à jour avec `picard31/main` après chaque fusion.
+
+Chaque ticket qui ajoute un terme du domaine l'écrit dans `GLOSSARY.md`, seul conflit de la vague 1. Pour qu'il ne le redevienne pas, chaque branche ajoute ses termes à la fin du fichier sans toucher aux autres, et une définition partagée par deux tickets s'écrit mot pour mot pareil dans les deux ; un conflit restant se règle en gardant les entrées des deux côtés.
 
 ## Avant de lancer
 

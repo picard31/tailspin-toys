@@ -41,7 +41,7 @@ Sans clé, le reste du site marche, les tests passent, et le Concierge répond q
 ## Tester
 
 ```bash
-npm run test:unit       # Vitest : 39 tests, en moins d'une seconde
+npm run test:unit       # Vitest, en moins d'une seconde
 npm run lint            # ESLint : le code, son format, les TSDoc et les Props
 npm run typecheck       # TypeScript 7 (tsgo) sur db/ et src/lib/
 ```
@@ -56,7 +56,7 @@ Les tests e2e (Playwright, `npm run test:e2e`) ne servent pas pendant la formati
 
 ## Le backlog
 
-Neuf tickets, rédigés par l'équipe de GitHub, sont dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Seul le 08, les standards de code, est livré ; l'ordre des autres est dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
+Neuf tickets, rédigés par l'équipe de GitHub, sont dans [`backlog/`](backlog/). Chacun a un besoin, puis des critères d'acceptation à cocher : accessibilité, `data-testid` et tests unitaires. Les vagues 0 et 1 sont livrées : le 08 (les standards de code), le 03, le 09 et la tranche 07.1 du 07 ; l'ordre des autres, et l'état de chaque vague, sont dans [`backlog/dev-plan.md`](backlog/dev-plan.md).
 
 | Ticket | En bref |
 |---|---|

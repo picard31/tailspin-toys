@@ -66,7 +66,7 @@ La conversation dure le temps de la page, et rien n'est gardé sur le serveur.
   - une sortie structurée ;
   - pas de streaming, ni de recherche web, ni aucun autre outil.
 - À chaque question, le Concierge construit le Catalogue en mémoire avec la fonction d'export du Catalogue que la commande `npm run db:export` utilise déjà. Il ne lit pas le fichier que cette commande écrit, qui reste là pour voir ce que lit le modèle.
-- Le code du Concierge vit dans son propre module. Il ne touche pas au module des Jeux, que les tranches 07.1 et 03 de la même vague modifient.
+- Le code du Concierge vit dans son propre module. Il ne touche pas au module des Jeux, que la tranche 07.1 de la même vague modifie ; le 03 a son propre module, `src/lib/game-details.ts`.
 
 ### Le point d'entrée du Concierge
 

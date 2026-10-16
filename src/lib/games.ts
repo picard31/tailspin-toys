@@ -109,7 +109,8 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters): Pr
 }
 
 /**
- * The home page catalog, the only data call the page makes: invalid URL values are ignored, never an error.
+ * The home page catalog, the only data call of its frontmatter (`CategoryFilter` reads its own
+ * options): invalid URL values are ignored, never an error.
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.

@@ -1,5 +1,7 @@
 /**
- * Builds the grounding file consumed by the Backer Concierge agent.
+ * Builds the catalog export: the Backer Concierge builds it in memory for each question
+ * (`src/lib/concierge.ts`), and `npm run db:export` writes it to `db/catalog.json` to show what the
+ * model reads.
  *
  * `toCatalogExport` is a pure transform so it can be unit tested without a
  * database, and the CLI below reads the seeded database through the injectable
@@ -37,7 +39,7 @@ export interface CatalogGame {
     ratingLabel: string;
 }
 
-/** The full grounding document uploaded to the agent. */
+/** The whole catalog, as the Concierge's system prompt embeds it. */
 export interface CatalogExport {
     source: string;
     note: string;
