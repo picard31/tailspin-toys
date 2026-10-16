@@ -28,6 +28,10 @@ _À éviter_ : facette, recherche (la recherche porte sur le titre, ticket 01)
 Une personne qui parcourt le Catalogue. Elle reste anonyme : la plateforme ne garde trace ni d'elle, ni des Jeux qu'elle soutient.
 _À éviter_ : backer, contributeur, utilisateur
 
+**Recherche** :
+Un texte libre saisi par le Visiteur, qui restreint le Catalogue affiché aux Jeux dont le titre le contient. Ce n'est pas un Filtre : un Filtre choisit parmi les valeurs connues d'une propriété, la Recherche compare un texte au titre.
+_À éviter_ : filtre, filtre par titre, requête, mot-clé
+
 **Concierge** :
 L'assistant qui répond aux questions des Visiteurs sur le Catalogue, sans rien affirmer que le Catalogue ne contienne. Le site l'affiche sous le nom « Backer Concierge ».
 _À éviter_ : chatbot, agent, assistant IA
