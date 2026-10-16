@@ -192,6 +192,6 @@ La livraison se fait en neuf tickets, sous `issues/`. Chacun se termine avec les
 
 03, 04 et 05 ne dépendent que de 02, mais ils modifient le même module et le même fichier de test : on les livre l'un après l'autre, dans l'ordre des numéros.
 
-Le Concierge se livre en parallèle des tranches 07.1 (filtrage par une Catégorie) et 03 (descriptions sur la fiche), sans fichier de code commun avec elles ; seul `GLOSSARY.md` leur est commun.
+Le Concierge se livre en parallèle de la tranche 07.1 (filtrage par une Catégorie) et du ticket 03 (descriptions sur la fiche), sans fichier de code commun avec l'un ou l'autre ; seul `GLOSSARY.md` leur est commun.
 
 Le seam unique revient sur une décision prise pendant le cadrage, selon laquelle aucun test ne simulerait l'appel au modèle : on simule `askModel`, une fonction du projet, et jamais le client du SDK.

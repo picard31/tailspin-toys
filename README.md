@@ -81,7 +81,7 @@ Vous pouvez aussi partir de votre propre idée : une liste de souhaits, des avis
 ## Ce qui change par rapport à l'original
 
 - Le contexte Copilot (`.github/copilot-instructions.md`, fichiers d'instructions, skills, workflows agentiques) est remplacé par le harness Claude Code ci-dessus.
-- L'adaptateur Node d'Astro est installé : les pages restent prérendues, et une route qui exporte `prerender = false` répond à la demande. Une route d'exemple, `GET /api/games/:id`, est testée dans `e2e-tests/api.spec.ts`.
+- L'adaptateur Node d'Astro est installé : les pages sont prérendues, sauf celles qui exportent `prerender = false`, comme l'accueil et les routes d'API, qui répondent à la demande. Une route d'exemple, `GET /api/games/:id`, est testée dans `e2e-tests/api.spec.ts`.
 - Les tests e2e marchent quand Claude Code les lance, et chaque worktree teste son propre serveur.
 - Windows : des fins de ligne LF partout, et des serveurs qui n'écoutent que sur la machine (pas d'alerte du pare-feu).
 - Les tickets, qui devenaient des issues GitHub dans un dépôt créé depuis le modèle, sont des fichiers de `backlog/`.
