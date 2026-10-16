@@ -22,7 +22,7 @@ Ce ticket ne touche que la Fiche. Il est bloqué par 01 seulement parce que son 
 - [ ] Le texte du lien est le même que l'Éditeur ait un ou plusieurs Jeux, et il se comprend hors contexte.
 - [ ] Ne changent pas :
   - [ ] le bloc « About the category », toujours absent quand sa description vaut `null` ;
-  - [ ] les Tags de la Catégorie et de l'Éditeur, et la description du Jeu ;
+  - [ ] les badges de la Catégorie et de l'Éditeur (le composant `Tag`), et la description du Jeu ;
   - [ ] le `getStaticPaths` de la Fiche ;
   - [ ] la carte de Jeu, qui ne contient toujours aucun lien.
 - [ ] Rien ne change dans `src/lib/`, et les tests existants passent sans modification.
@@ -30,5 +30,5 @@ Ce ticket ne touche que la Fiche. Il est bloqué par 01 seulement parce que son 
   - [ ] sur une Fiche, Tab atteint le lien avec un focus visible ;
   - [ ] Entrée ouvre la Page Éditeur du bon Éditeur ;
   - [ ] une carte de cette page ramène à une Fiche.
-- [ ] Chaque critère d'acceptation de `backlog/04-publisher-pages.md` est couvert par 01 ou par 02. Le fichier du backlog reste intact.
+- [ ] Chaque critère d'acceptation de `backlog/04-publisher-pages.md` est couvert par 01 ou par 02. Celui du nom de l'Éditeur qui mène à sa page l'est par le lien « All games by <nom> », selon la lecture qu'en donnent les Notes de la spec. Le fichier du backlog reste intact.
 - [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.

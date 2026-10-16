@@ -20,7 +20,7 @@ Ce ticket pose toute la lecture des données. Il n'utilise aucun code du Filtre 
 - [ ] Un `<h2>` « Games by <nom> », dans le style de « Featured Games » sur l'accueil, précède la grille.
 - [ ] La grille a les classes de celle de l'accueil et porte `data-testid="publisher-games"`. Chaque Jeu y est un `GameCard` sans modification.
 - [ ] Sans Jeu, la grille laisse la place à un `EmptyState`, dont le slot contient un `<p data-testid="publisher-no-games">` « This publisher has no games yet. ».
-- [ ] En bas, le bouton « Back to all games » mène à `/`, comme sur la Fiche.
+- [ ] En bas, le bouton « Back to all games » mène à `/`, comme sur la Fiche, et porte `data-testid="publisher-back-link"`.
 - [ ] Le module des Jeux gagne `getPublisherGames(db, publisherId)`, sa seule modification :
   - [ ] la fonction rend les Jeux de cet Éditeur, triés par titre de A à Z, chacun avec sa Catégorie et son Éditeur, et une liste vide quand il n'en a aucun ;
   - [ ] elle réutilise la requête et la conversion privées des listes ;
@@ -34,7 +34,7 @@ Ce ticket pose toute la lecture des données. Il n'utilise aucun code du Filtre 
 
   Chaque fonction exportée a son TSDoc.
 - [ ] Le module des types ne gagne aucun type : seul le commentaire de `PublisherDetails` s'élargit à la Page Éditeur. Aucun code de la 07.2 n'est utilisé (`getAllPublishers`, `getCatalogGames`, `getCatalog`). Aucun changement de schéma, de seed, de CSV ni de migration.
-- [ ] Le fichier de test du module de la Page Éditeur prouve, sur une base en mémoire créée par `createTestDatabase()`, avec des Éditeurs et des Jeux insérés dans l'ordre inverse de l'ordre attendu :
+- [ ] Le fichier de test du module de la Page Éditeur prouve, sur une base en mémoire créée par `createTestDatabase()`, avec des Éditeurs et des Jeux insérés dans un ordre qui n'est ni l'ordre attendu ni son inverse :
   - [ ] que `getPublisherPage` rend le nom, la description et les seuls Jeux de cet Éditeur, alors qu'un autre Éditeur a des Jeux dans la même base ;
   - [ ] que ces Jeux sont triés par titre de A à Z, chacun avec sa Catégorie et son Éditeur ;
   - [ ] qu'un Éditeur sans Jeu rend `games: []` ;

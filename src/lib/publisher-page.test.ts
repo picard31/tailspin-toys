@@ -69,14 +69,15 @@ describe('getPublisherPage', () => {
         await insertGames(db, ['Game 02', 'Game 01'], categoryId, id);
 
         const page = await getPublisherPage(db, id);
-        expect(page?.games.map((game) => game.title)).toEqual(['Game 01', 'Game 02']);
+        // Sorted here so that only the selection is tested: the order has its own test.
+        expect(page?.games.map((game) => game.title).sort()).toEqual(['Game 01', 'Game 02']);
     });
 
     it('returns the games sorted by title', async () => {
         const categoryId = await insertCategory(db);
         const id = await insertPublisher(db, 'Pub One');
-        // Insert titles in reverse-alphabetical order to prove ordering is applied.
-        await insertGames(db, ['Game 03', 'Game 02', 'Game 01'], categoryId, id);
+        // Neither the insertion order nor its reverse is the title order: only a sort by title passes.
+        await insertGames(db, ['Game 02', 'Game 03', 'Game 01'], categoryId, id);
 
         const page = await getPublisherPage(db, id);
         expect(page?.games.map((game) => game.title)).toEqual(['Game 01', 'Game 02', 'Game 03']);
@@ -84,6 +85,8 @@ describe('getPublisherPage', () => {
 
     it('returns each game with its category and publisher', async () => {
         const categoryId = await insertCategory(db);
+        // Another publisher first, so that the publisher's id differs from the category's: a join on the wrong column shows.
+        await insertPublisher(db, 'Pub Two');
         const id = await insertPublisher(db, 'Pub One');
         const [gameId] = await insertGames(db, ['Game 01'], categoryId, id);
 
@@ -136,19 +139,21 @@ describe('getPublisherIds', () => {
 
     it('includes a publisher with no game', async () => {
         const categoryId = await insertCategory(db);
-        // Inserted last but first by name, to prove the publisher with no game is sorted, not appended.
-        const withGame = await insertPublisher(db, 'Pub Two');
+        // 'Pub One', which has no game, goes in last but comes first by name: it is sorted, not appended. The insertion order (Three, Two, One) and its reverse both differ from the name order (One, Three, Two).
+        const pubThree = await insertPublisher(db, 'Pub Three');
+        const pubTwo = await insertPublisher(db, 'Pub Two');
         const withoutGame = await insertPublisher(db, 'Pub One');
-        await insertGames(db, ['Game 01'], categoryId, withGame);
+        await insertGames(db, ['Game 01'], categoryId, pubThree);
+        await insertGames(db, ['Game 02'], categoryId, pubTwo);
 
-        expect(await getPublisherIds(db)).toEqual([withoutGame, withGame]);
+        expect(await getPublisherIds(db)).toEqual([withoutGame, pubThree, pubTwo]);
     });
 
     it('sorts the ids by publisher name', async () => {
-        // Insert names in reverse-alphabetical order to prove ordering is applied.
+        // Neither the insertion order nor its reverse is the name order: only a sort by name passes.
         const pubTwo = await insertPublisher(db, 'Pub Two');
-        const pubThree = await insertPublisher(db, 'Pub Three');
         const pubOne = await insertPublisher(db, 'Pub One');
+        const pubThree = await insertPublisher(db, 'Pub Three');
 
         expect(await getPublisherIds(db)).toEqual([pubOne, pubThree, pubTwo]);
     });
