@@ -66,7 +66,7 @@ La conversation dure le temps de la page, et rien n'est gardé sur le serveur.
   - une sortie structurée ;
   - pas de streaming, ni de recherche web, ni aucun autre outil.
 - À chaque question, le Concierge construit le Catalogue en mémoire avec la fonction d'export du Catalogue que la commande `npm run db:export` utilise déjà. Il ne lit pas le fichier que cette commande écrit, qui reste là pour voir ce que lit le modèle.
-- Le code du Concierge vit dans son propre module. Il ne touche pas au module des Jeux, que les tranches 07.1 et 03 de la même vague modifient.
+- Le code du Concierge vit dans son propre module. Il ne touche pas au module des Jeux, que la tranche 07.1 de la même vague modifie ; le 03 a son propre module, `src/lib/game-details.ts`.
 
 ### Le point d'entrée du Concierge
 
@@ -192,6 +192,6 @@ La livraison se fait en neuf tickets, sous `issues/`. Chacun se termine avec les
 
 03, 04 et 05 ne dépendent que de 02, mais ils modifient le même module et le même fichier de test : on les livre l'un après l'autre, dans l'ordre des numéros.
 
-Le Concierge se livre en parallèle des tranches 07.1 (filtrage par une Catégorie) et 03 (descriptions sur la fiche), sans fichier de code commun avec elles ; seul `GLOSSARY.md` leur est commun.
+Le Concierge se livre en parallèle de la tranche 07.1 (filtrage par une Catégorie) et du ticket 03 (descriptions sur la fiche), sans fichier de code commun avec l'un ou l'autre ; seul `GLOSSARY.md` leur est commun.
 
 Le seam unique revient sur une décision prise pendant le cadrage, selon laquelle aucun test ne simulerait l'appel au modèle : on simule `askModel`, une fonction du projet, et jamais le client du SDK.

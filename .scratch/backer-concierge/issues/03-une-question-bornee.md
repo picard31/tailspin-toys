@@ -24,3 +24,5 @@ Ce ticket complète la lecture de la question posée par le ticket 02. Chaque qu
 ## Comments
 
 Livré par la PR #4. La règle « exactement un message » a ensuite été remplacée par les règles d'une conversation (ticket 07), comme celui-ci le prévoit.
+
+Vérifié à la main sur `npm run dev`, avec une clé factice (sans clé, le 503 passe avant le 400) : une question faite d'espaces donne « The question is empty. Please type a question. » dans la conversation, sans appel au modèle, et le champ garde la question.

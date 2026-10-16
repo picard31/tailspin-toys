@@ -1,5 +1,7 @@
 /**
- * Builds the grounding file consumed by the Backer Concierge agent.
+ * Builds the catalog export: the Backer Concierge builds it in memory for each question
+ * (`src/lib/concierge.ts`), and `npm run db:export` writes it to `db/catalog.json` to show what the
+ * model reads.
  *
  * `toCatalogExport` is a pure transform so it can be unit tested without a
  * database, and the CLI below reads the seeded database through the injectable
@@ -19,13 +21,13 @@ import type { Game } from '../src/types/game';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-/** Default location of the generated grounding file. */
+/** Default location of the file `npm run db:export` writes. */
 export const CATALOG_EXPORT_PATH = join(here, 'catalog.json');
 
 const UNKNOWN_CATEGORY = 'Uncategorized';
 const UNKNOWN_PUBLISHER = 'Unknown publisher';
 
-/** A single catalog entry as the agent sees it. */
+/** A single catalog entry, as the Concierge's model sees it. */
 export interface CatalogGame {
     id: number;
     title: string;
@@ -37,7 +39,7 @@ export interface CatalogGame {
     ratingLabel: string;
 }
 
-/** The full grounding document uploaded to the agent. */
+/** The whole catalog, as the Concierge's system prompt embeds it. */
 export interface CatalogExport {
     source: string;
     note: string;
@@ -75,7 +77,7 @@ function distinctSorted(values: string[]): string[] {
 }
 
 /**
- * Turn data-access results into the agent grounding document. Pure: the same
+ * Turn data-access results into the catalog export. Pure: the same
  * input always produces the same output, regardless of input ordering.
  *
  * Games are sorted by title using ordinal (UTF-16 code unit) comparison, with
@@ -83,7 +85,7 @@ function distinctSorted(values: string[]): string[] {
  * order — so the export is byte-identical across environments.
  *
  * @param games - Games as `getAllGames` returns them, in any order.
- * @returns The grounding document, with a game missing its category or
+ * @returns The catalog export, with a game missing its category or
  * publisher filed under a placeholder name.
  */
 export function toCatalogExport(games: Game[]): CatalogExport {
@@ -113,7 +115,7 @@ export function serializeCatalogExport(exported: CatalogExport): string {
 }
 
 /**
- * Read the seeded database and write the grounding file to disk.
+ * Read the seeded database and write the catalog export to disk.
  *
  * @param db - Database to read, injected so a test can export an in-memory
  * one. The CLI below passes `createDatabase()`.

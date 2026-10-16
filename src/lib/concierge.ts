@@ -158,10 +158,7 @@ interface ModelOutput {
 /** Why the model may stop without a usable answer: it declined, or ran out of tokens mid-answer. */
 const UNUSABLE_STOP_REASONS = new Set(['refusal', 'max_tokens']);
 
-/**
- * The model's reply when it is usable, or null when it is not: an unusable stop reason, an output
- * off the schema, or an answer the conversation rules would reject once the page sends it back.
- */
+/** The model's reply when usable; null for an unusable stop reason, an output off the schema, or an answer the conversation rules would reject once sent back. */
 function readModelOutput(reply: ModelReply): ModelOutput | null {
     if (reply.stopReason !== null && UNUSABLE_STOP_REASONS.has(reply.stopReason)) {
         return null;
