@@ -5,6 +5,9 @@ export interface CatalogFilters {
     categoryIds: number[];
 }
 
+/** What one filter family keeps: a list of ids, or one id that may be absent. */
+type FilterValue = number[] | number | null;
+
 /**
  * The filters kept from the URL, each family reading its own parameter, so that a new family
  * adds one line here.
@@ -27,5 +30,7 @@ export function readCatalogFilters(searchParams: URLSearchParams): CatalogFilter
  *   other than `null`.
  */
 export function hasActiveFilters(filters: CatalogFilters): boolean {
-    return Object.values(filters).some((value) => (Array.isArray(value) ? value.length > 0 : value !== null));
+    // `satisfies` makes typecheck fail on a family of another shape, which this test would misread.
+    const values: FilterValue[] = Object.values(filters satisfies Record<keyof CatalogFilters, FilterValue>);
+    return values.some((value) => (Array.isArray(value) ? value.length > 0 : value !== null));
 }
