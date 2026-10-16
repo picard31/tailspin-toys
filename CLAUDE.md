@@ -13,6 +13,11 @@ Une tâche est finie quand `npm run test:unit`, `npm run lint` et `npm run typec
 
 Ne lance ni les tests e2e (`npm run test:e2e`) ni Playwright, et n'écris pas de nouveau test e2e : pendant la formation, les postes n'ont pas de navigateur de test. Ce qui doit être prouvé l'est par Vitest, sur les fonctions de `src/lib/` et de `db/`.
 
+## Branches et PR
+
+- Les branches se poussent sur le remote `picard31` (`https://github.com/picard31/tailspin-toys.git`), et les PR s'ouvrent dans ce dépôt, vers sa branche `main` : `gh pr create --repo picard31/tailspin-toys --base main`.
+- Jamais vers `denneulin/tailspin-toys`, le remote `origin` : on n'y pousse aucune branche et on n'y ouvre aucune PR, même quand GitHub le propose comme base par défaut d'un fork. `origin` ne sert qu'à récupérer `main`.
+
 ## Langue
 
 Les échanges, les specs, les tickets, le glossaire et les ADR sont en français. Le code, ses commentaires et les textes affichés par le site restent en anglais.
