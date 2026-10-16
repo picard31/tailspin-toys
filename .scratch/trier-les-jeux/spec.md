@@ -153,3 +153,11 @@ L'ordre est total : le même Tri donne toujours le même ordre, ce dont la pagin
   - Le renommage du bouton en « Apply » est fait par la même ligne que le 01, et git le fusionne seul.
   - Rebaser la branche après chaque fusion.
 - La place des Jeux sans Note et le départage, que le critère d'acceptation veut « documentés », sont dans l'ADR 0005.
+
+La livraison se fait en trois tranches verticales, chacune dans son ticket sous `issues/`. On les livre l'une après l'autre sur la même branche : elles écrivent toutes dans le module du Tri et son fichier de test.
+
+| Ticket | Bloqué par | Livre |
+|---|---|---|
+| 01 Titre dans les deux sens | — | La liste « Order » et le titre de A à Z ou de Z à A. Il pose tout ce qui est partagé : le module du Tri, `getCatalogGames(db, filters, sort)`, `sort` dans `getCatalog`, la prop du formulaire et le bouton « Apply ». |
+| 02 Par Note | 01 | La liste « Sort by », le Tri par Note dans les deux sens, les Jeux sans Note en dernier et les défauts indépendants. |
+| 03 « Clear filters » garde le Tri | 01, 02 | La fonction d'URL d'effacement et les deux liens « Clear filters ». |
