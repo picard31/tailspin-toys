@@ -22,12 +22,14 @@ Le ticket 07 se découpe lui-même en quatre tranches (voir sa section *Delivery
 
 ## Les vagues
 
-| Vague | En parallèle | Prérequis |
-|---|---|---|
-| 0 | **08** seul | aucun |
-| 1 | **07.1** · **03** · **09** (ses neuf tickets l'un après l'autre) | 08 fusionné |
-| 2 | **07.2** · **07.3** · **01** · **02** · **05** · **04** | 07.1 fusionnée ; 03 fusionné pour 04 |
-| 3 | **07.4** · **06** | 07.2, 07.3, 01 et 02 fusionnés |
+| Vague | En parallèle | Prérequis | État |
+|---|---|---|---|
+| 0 | **08** seul | aucun | ✅ Livrée le 16/10/2026 : [PR #1](https://github.com/picard31/tailspin-toys/pull/1) fusionnée |
+| 1 | **07.1** · **03** · **09** (ses neuf tickets l'un après l'autre) | 08 fusionné | Débloquée |
+| 2 | **07.2** · **07.3** · **01** · **02** · **05** · **04** | 07.1 fusionnée ; 03 fusionné pour 04 | En attente |
+| 3 | **07.4** · **06** | 07.2, 07.3, 01 et 02 fusionnés | En attente |
+
+La vague 0 a livré les standards de code (spec `.scratch/standards-de-code/spec.md`, ADR 0002) : `npm run lint` impose désormais le format et la présence des TSDoc et des commentaires de Props. Une branche ouverte avant sa fusion se rebase sur `main` : ses conflits viennent surtout du reformatage, et `npm run lint -- --fix` remet ensuite son code au format.
 
 Les dépendances, une par ligne :
 
