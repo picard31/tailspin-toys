@@ -59,7 +59,14 @@ function createRemoteCallback(sqlite: DatabaseSync): AsyncRemoteCallback {
     };
 }
 
-/** Run generated migration statements atomically through Node's SQLite driver. */
+/**
+ * Run generated migration statements atomically through Node's SQLite driver,
+ * so a failed migration leaves the schema as it was.
+ *
+ * @param sqlite - Raw connection from `createDatabaseConnection`.
+ * @param queries - Statements handed over by Drizzle's migrator.
+ * @throws The error of the statement that failed, once the transaction is rolled back.
+ */
 export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[]): void {
     sqlite.exec('BEGIN');
     try {
@@ -73,22 +80,43 @@ export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[])
     }
 }
 
-/** Create a Drizzle client for the given local SQLite connection URL. */
+/**
+ * Create a Drizzle client for the given local SQLite connection URL. Scripts
+ * call it; pages and routes share `getDatabase()` instead.
+ *
+ * @param url - `file:<path>` or `:memory:`; defaults to `DATABASE_URL`, then `file:tailspin.db`.
+ * @returns A new client, with its own connection.
+ * @throws When the URL is neither a `file:` URL nor `:memory:`.
+ */
 export function createDatabase(url: string = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL): Database {
     return createDatabaseConnection(url).db;
 }
 
-/** Create the Drizzle client and its Node SQLite connection for migration workflows. */
+/**
+ * Create the Drizzle client and its Node SQLite connection. Migrations need
+ * the raw connection, to run their statements in one transaction.
+ *
+ * @param url - `file:<path>` or `:memory:`; defaults to `DATABASE_URL`, then `file:tailspin.db`.
+ * @returns The client and the connection it runs on.
+ * @throws When the URL is neither a `file:` URL nor `:memory:`.
+ */
 export function createDatabaseConnection(
     url: string = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
 ): DatabaseConnection {
     const sqlite = new DatabaseSync(databasePath(url));
+    // Rows come back keyed by column name: table-qualified names keep the two `id` columns of a join apart.
     sqlite.exec('PRAGMA short_column_names = OFF; PRAGMA full_column_names = ON;');
     const db = drizzle(createRemoteCallback(sqlite), { schema });
     return { db, sqlite };
 }
 
-/** Shared singleton database client used by pages at build time. */
+/**
+ * Shared database client, opened on first use: pages read it at build time,
+ * and on-demand routes such as `/api/games/:id` at request time.
+ *
+ * @returns The same client on every call, for `DATABASE_URL` or `file:tailspin.db`.
+ * @throws On first use, when `DATABASE_URL` is neither a `file:` URL nor `:memory:`.
+ */
 export function getDatabase(): Database {
     if (!cachedDb) {
         cachedDb = createDatabase();

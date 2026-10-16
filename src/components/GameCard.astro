@@ -3,7 +3,12 @@ import type { Game } from '../types/game';
 import Tag from './Tag.astro';
 import ArrowRight from '../assets/icons/arrow-right.svg';
 
+/**
+ * Catalog tile for one game. The whole card is a single link to the game's
+ * detail page, so it holds no other link: nested links are invalid HTML.
+ */
 interface Props {
+    /** Game to show; its category or publisher tag is left out when null. */
     game: Game;
 }
 

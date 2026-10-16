@@ -8,7 +8,15 @@ function shownDescription(description: string | null): string | null {
     return description !== null && description.trim().length > 0 ? description : null;
 }
 
-/** A single game with the descriptions of its category and publisher, or null when it does not exist. */
+/**
+ * A single game with the descriptions of its category and publisher, for the game's own page.
+ * It lives apart from `games.ts` so that the listing types and `getGameById` stay unchanged.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @param id - The game's primary key.
+ * @returns The game, or `null` when no game has this id. A description that is missing, empty or
+ *   only whitespace is `null`, so the page only has to test `null`.
+ */
 export async function getGameDetails(db: Database, id: number): Promise<GameDetails | null> {
     const row = await db
         .select({
@@ -41,18 +49,18 @@ export async function getGameDetails(db: Database, id: number): Promise<GameDeta
         category:
             row.categoryId !== null && row.categoryName !== null
                 ? {
-                      id: row.categoryId,
-                      name: row.categoryName,
-                      description: shownDescription(row.categoryDescription),
-                  }
+                    id: row.categoryId,
+                    name: row.categoryName,
+                    description: shownDescription(row.categoryDescription),
+                }
                 : null,
         publisher:
             row.publisherId !== null && row.publisherName !== null
                 ? {
-                      id: row.publisherId,
-                      name: row.publisherName,
-                      description: shownDescription(row.publisherDescription),
-                  }
+                    id: row.publisherId,
+                    name: row.publisherName,
+                    description: shownDescription(row.publisherDescription),
+                }
                 : null,
     };
 }

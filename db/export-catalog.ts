@@ -81,6 +81,10 @@ function distinctSorted(values: string[]): string[] {
  * Games are sorted by title using ordinal (UTF-16 code unit) comparison, with
  * `id` as a tiebreaker for duplicate titles — not locale-aware alphabetical
  * order — so the export is byte-identical across environments.
+ *
+ * @param games - Games as `getAllGames` returns them, in any order.
+ * @returns The grounding document, with a game missing its category or
+ * publisher filed under a placeholder name.
  */
 export function toCatalogExport(games: Game[]): CatalogExport {
     const entries = games
@@ -97,13 +101,30 @@ export function toCatalogExport(games: Game[]): CatalogExport {
     };
 }
 
-/** Serialize the export with stable formatting and a trailing newline. */
+/**
+ * Serialize the export with stable formatting and a trailing newline, so two
+ * runs on the same catalog write the same bytes.
+ *
+ * @param exported - Document built by `toCatalogExport`.
+ * @returns JSON indented by two spaces, ending with a newline.
+ */
 export function serializeCatalogExport(exported: CatalogExport): string {
     return `${JSON.stringify(exported, null, 2)}\n`;
 }
 
-/** Read the seeded database and write the grounding file to disk. */
-export async function writeCatalogExport(db: Database, outputPath: string = CATALOG_EXPORT_PATH): Promise<CatalogExport> {
+/**
+ * Read the seeded database and write the grounding file to disk.
+ *
+ * @param db - Database to read, injected so a test can export an in-memory
+ * one. The CLI below passes `createDatabase()`.
+ * @param outputPath - File to write, its folder created if needed; defaults to
+ * `CATALOG_EXPORT_PATH`.
+ * @returns The document that was written.
+ */
+export async function writeCatalogExport(
+    db: Database,
+    outputPath: string = CATALOG_EXPORT_PATH,
+): Promise<CatalogExport> {
     const exported = toCatalogExport(await getAllGames(db));
     mkdirSync(dirname(outputPath), { recursive: true });
     writeFileSync(outputPath, serializeCatalogExport(exported), 'utf-8');
