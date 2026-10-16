@@ -57,6 +57,13 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
           Ask
         </button>
       </div>
+      <button
+        type="button"
+        class:list={['mt-4 px-3 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline', focusRing]}
+        data-testid="concierge-reset"
+      >
+        New conversation
+      </button>
     </form>
   </div>
 </Layout>
@@ -90,6 +97,7 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
   const ask = document.querySelector<HTMLButtonElement>('[data-testid="concierge-ask"]');
   const log = document.querySelector<HTMLElement>('[data-testid="concierge-log"]');
   const status = document.querySelector<HTMLElement>('[data-testid="concierge-status"]');
+  const reset = document.querySelector<HTMLButtonElement>('[data-testid="concierge-reset"]');
 
   /** A labelled block of plain text: text is never interpreted as HTML. */
   function entry(label: string, text: string, classes: string, testId?: string): HTMLElement {
@@ -146,10 +154,22 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
     }
   }
 
-  if (form && field && ask && log && status) {
+  if (form && field && ask && log && status && reset) {
     let pending = false;
     // The conversation lives in the page only: nothing is kept on the server, and a reload forgets it.
     const history: ConciergeMessage[] = [];
+    // Bumped by "New conversation", so that a reply to the previous conversation is dropped.
+    let conversation = 0;
+
+    reset.addEventListener('click', () => {
+      conversation += 1;
+      history.length = 0;
+      log.replaceChildren();
+      status.textContent = '';
+      ask.removeAttribute('aria-disabled');
+      pending = false;
+      field.focus();
+    });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -164,7 +184,11 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
       const question = field.value;
       log.append(entry('You', question, 'bg-slate-800 border-slate-700'));
       const asked: ConciergeMessage = { role: 'user', content: question };
+      const askedIn = conversation;
       const { ok, reply } = await askConcierge([...history, asked]);
+      if (askedIn !== conversation) {
+        return;
+      }
 
       if (ok && typeof reply.answer === 'string') {
         // Only an answered question enters the history, followed by the answer's text.

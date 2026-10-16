@@ -87,6 +87,14 @@ function assistant(content: string): ConciergeMessage {
     return { role: 'assistant', content };
 }
 
+/** A request body holding `questions` questions, each one but the last followed by an answer. */
+function conversationOf(questions: number): string {
+    const messages = Array.from({ length: questions }, (_, i) => [user(`Question ${i + 1}?`), assistant(`Answer ${i + 1}.`)])
+        .flat()
+        .slice(0, -1);
+    return JSON.stringify({ messages });
+}
+
 /** The titles of the recommended games of a 200 result. */
 function recommendedTitles(result: ConciergeResult): string[] {
     expect(result.status).toBe(200);
@@ -172,6 +180,21 @@ describe('answerConcierge', () => {
         const result = await answerConcierge(db, JSON.stringify({ messages }), { apiKey: API_KEY, askModel });
         expect(result.status).toBe(200);
         expect(calls).toHaveLength(1);
+    });
+
+    it('accepts a conversation of ten questions', async () => {
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, conversationOf(10), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+        expect(calls[0].messages).toHaveLength(19);
+    });
+
+    it('returns 400 for an eleventh question, inviting to start a new conversation', async () => {
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, conversationOf(11), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(400);
+        expect(result.body).toEqual({ error: expect.stringMatching(/new conversation/i) });
+        expect(calls).toHaveLength(0);
     });
 
     it('accepts a question of 500 characters', async () => {

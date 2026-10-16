@@ -81,6 +81,9 @@ function buildSystemPrompt(catalog: CatalogExport): string {
 /** The longest message of each role, in characters: a visitor's question, a Concierge answer sent back. */
 const MAX_LENGTH: Record<ConciergeMessage['role'], number> = { user: 500, assistant: 4000 };
 
+/** The most questions a conversation may hold, which bounds its cost. */
+const MAX_QUESTIONS = 10;
+
 type ReadResult = { messages: ConciergeMessage[] } | { error: string };
 
 /** One message of the conversation, or the reason it breaks the rules. */
@@ -136,6 +139,11 @@ function readConversation(body: string): ReadResult {
     }
     if (conversation[conversation.length - 1].role !== 'user') {
         return { error: 'The conversation must end with a question from the visitor.' };
+    }
+    if (conversation.filter((message) => message.role === 'user').length > MAX_QUESTIONS) {
+        return {
+            error: `This conversation has reached ${MAX_QUESTIONS} questions. Please start a new conversation to ask more.`,
+        };
     }
     return { messages: conversation };
 }
