@@ -1,4 +1,5 @@
-import { eq, asc, and } from 'drizzle-orm';
+import { eq, asc, and, or, sql, type SQL } from 'drizzle-orm';
+import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
@@ -123,4 +124,31 @@ export async function getCatalog(db: Database, searchParams: URLSearchParams): P
     const catalogGames = await getCatalogGames(db, filters);
     const { total, averageRating } = await getCatalogSummary(db);
     return { games: catalogGames, total, averageRating, filters };
+}
+
+/** Case-insensitive substring test; `instr` has no wildcards, so `%` and `_` match themselves. */
+function containsIgnoringCase(column: SQLiteColumn, text: string): SQL {
+    return sql`instr(lower(${column}), lower(${text})) > 0`;
+}
+
+/**
+ * The games whose title, category or publisher contains the query, ignoring case: the
+ * `search_games` tool of the catalog MCP server (`mcp/catalog-server.ts`).
+ *
+ * @param db - Injected: the MCP server passes its database, tests an in-memory database.
+ * @param query - Free text, such as "strategy" or "CodeForge", trimmed first. Descriptions are not searched.
+ * @returns The matching games sorted by title; every game for a blank query.
+ */
+export async function searchGames(db: Database, query: string): Promise<Game[]> {
+    const text = query.trim();
+    const rows = await baseGamesQuery(db)
+        .where(
+            or(
+                containsIgnoringCase(games.title, text),
+                containsIgnoringCase(categories.name, text),
+                containsIgnoringCase(publishers.name, text),
+            ),
+        )
+        .orderBy(asc(games.title));
+    return rows.map(mapGame);
 }
