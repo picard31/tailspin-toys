@@ -28,8 +28,9 @@ export async function getPublisherIds(db: Database): Promise<number[]> {
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param id - The publisher's primary key.
- * @returns The publisher and its games sorted by title, or `null` when no publisher has this id.
- *   A description that is missing, empty or only whitespace is `null`, as on a game's page.
+ * @returns The publisher and its games sorted by title, an empty list when it has none, or `null`
+ *   when no publisher has this id. A description that is missing, empty or only whitespace is
+ *   `null`, as on a game's page.
  */
 export async function getPublisherPage(db: Database, id: number): Promise<PublisherPage | null> {
     const row = await db

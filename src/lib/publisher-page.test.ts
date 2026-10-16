@@ -52,7 +52,11 @@ describe('getPublisherPage', () => {
     });
 
     it('returns the publisher with its description', async () => {
+        const categoryId = await insertCategory(db);
+        const otherId = await insertPublisher(db, 'Pub Two', 'Pub Two makes other games');
+        await insertGames(db, ['Other Game'], categoryId, otherId);
         const id = await insertPublisher(db, 'Pub One', 'Pub One makes games');
+
         const page = await getPublisherPage(db, id);
         expect(page?.publisher).toEqual({ id, name: 'Pub One', description: 'Pub One makes games' });
     });
@@ -97,7 +101,11 @@ describe('getPublisherPage', () => {
     });
 
     it('returns no game for a publisher that has none', async () => {
+        const categoryId = await insertCategory(db);
+        const otherId = await insertPublisher(db, 'Pub Two');
+        await insertGames(db, ['Other Game'], categoryId, otherId);
         const id = await insertPublisher(db, 'Pub One');
+
         const page = await getPublisherPage(db, id);
         expect(page).not.toBeNull();
         expect(page?.games).toEqual([]);
@@ -128,7 +136,7 @@ describe('getPublisherIds', () => {
 
     it('includes a publisher with no game', async () => {
         const categoryId = await insertCategory(db);
-        // The publisher with no game comes last in insertion order but first by name.
+        // Inserted last but first by name, to prove the publisher with no game is sorted, not appended.
         const withGame = await insertPublisher(db, 'Pub Two');
         const withoutGame = await insertPublisher(db, 'Pub One');
         await insertGames(db, ['Game 01'], categoryId, withGame);
