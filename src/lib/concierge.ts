@@ -158,7 +158,10 @@ interface ModelOutput {
 /** Why the model may stop without a usable answer: it declined, or ran out of tokens mid-answer. */
 const UNUSABLE_STOP_REASONS = new Set(['refusal', 'max_tokens']);
 
-/** The model's reply when it follows the output schema, or null when it does not. */
+/**
+ * The model's reply when it is usable, or null when it is not: an unusable stop reason, an output
+ * off the schema, or an answer the conversation rules would reject once the page sends it back.
+ */
 function readModelOutput(reply: ModelReply): ModelOutput | null {
     if (reply.stopReason !== null && UNUSABLE_STOP_REASONS.has(reply.stopReason)) {
         return null;
@@ -197,8 +200,9 @@ function recommendedGames(catalog: CatalogExport, gameIds: number[]): CatalogGam
  * @param body - The raw request body; reading its JSON is part of what is checked.
  * @param options - The key read by the route, and the function that asks the model.
  * @returns The HTTP status and JSON body to send: 200 with the answer and the recommended games
- *   as the catalog describes them, 400 for an invalid conversation, 502 when the model fails or
- *   answers off-schema, 503 without a key. `askModel` is only called for a 200 or a 502.
+ *   as the catalog describes them, 400 for an invalid conversation, 502 when the model fails,
+ *   answers off-schema, or gives an empty or over-long answer, 503 without a key. `askModel` is
+ *   only called for a 200 or a 502.
  */
 export async function answerConcierge(
     db: Database,
