@@ -23,26 +23,26 @@ Le ticket 04 du backlog (pages d'Éditeur) réutilisera `GameDetails`, et ajoute
 
 ## Critères d'acceptation
 
-- [ ] `src/types/game.ts` définit :
+- [x] `src/types/game.ts` définit :
   - `CategoryDetails` et `PublisherDetails`, qui étendent `Category` et `Publisher` avec `description: string | null` ;
   - `GameDetails`, un `Game` dont la Catégorie et l'Éditeur sont de ces types, avec la même nullité que dans `Game`.
 
   `Game`, `Category` et `Publisher` ne changent pas.
-- [ ] `getGameDetails(db, id)`, dans `src/lib/game-details.ts`, rend le `GameDetails` du Jeu, ou `null` quand il n'existe pas.
-- [ ] Une description `null`, vide ou faite seulement d'espaces devient `null` dans `getGameDetails`. La page n'a qu'à tester `null`.
-- [ ] `src/lib/games.ts` n'est pas modifié. `getGameById`, `getAllGames` et la route `GET /api/games/:id` rendent exactement ce qu'ils rendaient.
-- [ ] `src/pages/game/[id].astro` lit le Jeu avec `getGameDetails`, y compris pour la redirection vers `/404`. `getStaticPaths` ne change pas.
-- [ ] Après la section « About this game », la fiche montre deux blocs, dans cet ordre :
+- [x] `getGameDetails(db, id)`, dans `src/lib/game-details.ts`, rend le `GameDetails` du Jeu, ou `null` quand il n'existe pas.
+- [x] Une description `null`, vide ou faite seulement d'espaces devient `null` dans `getGameDetails`. La page n'a qu'à tester `null`.
+- [x] `src/lib/games.ts` n'est pas modifié. `getGameById`, `getAllGames` et la route `GET /api/games/:id` rendent exactement ce qu'ils rendaient.
+- [x] `src/pages/game/[id].astro` lit le Jeu avec `getGameDetails`, y compris pour la redirection vers `/404`. `getStaticPaths` ne change pas.
+- [x] Après la section « About this game », la fiche montre deux blocs, dans cet ordre :
   - « About the category » : un `<section>` titré par un `<h2>`, et un `<p>` qui porte `data-testid="game-details-category-description"` ;
   - « About the publisher » : un `<section>` titré par un `<h2>`, et un `<p>` qui porte `data-testid="game-details-publisher-description"`.
 
   Titres et texte ont le style de « About this game ».
-- [ ] Un bloc n'est pas dans le HTML quand sa description est `null`, ni quand le Jeu n'a pas de Catégorie ou d'Éditeur.
-- [ ] Les tags de la Catégorie et de l'Éditeur (`game-details-category`, `game-details-publisher`) ne changent pas.
-- [ ] `src/lib/game-details.test.ts` prouve, sur une base en mémoire créée par `createTestDatabase()` :
+- [x] Un bloc n'est pas dans le HTML quand sa description est `null`, ni quand le Jeu n'a pas de Catégorie ou d'Éditeur.
+- [x] Les tags de la Catégorie et de l'Éditeur (`game-details-category`, `game-details-publisher`) ne changent pas.
+- [x] `src/lib/game-details.test.ts` prouve, sur une base en mémoire créée par `createTestDatabase()` :
   - que les deux descriptions remontent ;
   - avec `it.each`, qu'une description `null`, `''` ou `'   '` donne `null`, pour la Catégorie comme pour l'Éditeur ;
   - qu'un identifiant inconnu donne `null`.
-- [ ] Les tests existants de `src/lib/games.test.ts` passent sans modification.
-- [ ] On vérifie à la main, sur `npm run dev`, qu'une fiche de Jeu montre les deux blocs, dans l'ordre, avec le style de « About this game ».
-- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+- [x] Les tests existants de `src/lib/games.test.ts` passent sans modification.
+- [x] On vérifie à la main, sur `npm run dev`, qu'une fiche de Jeu montre les deux blocs, dans l'ordre, avec le style de « About this game ».
+- [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
