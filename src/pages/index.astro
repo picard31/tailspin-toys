@@ -3,15 +3,21 @@ import Layout from '../layouts/Layout.astro';
 import GameCard from '../components/GameCard.astro';
 import PageHero from '../components/PageHero.astro';
 import EmptyState from '../components/EmptyState.astro';
+import CatalogFilters from '../components/CatalogFilters.astro';
 import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
+import { getCatalog } from '../lib/games';
+import { hasActiveFilters } from '../lib/catalog-filters';
 
-export const prerender = true;
+// Rendered on demand: the filters are read from the query string (ADR 0001).
+export const prerender = false;
 
-const games = await getAllGames(getDatabase());
+const { games, total, filters } = await getCatalog(getDatabase(), Astro.url.searchParams);
+const title = hasActiveFilters(filters)
+    ? 'Filtered games - Tailspin Toys'
+    : 'Tailspin Toys - Crowdfunding your new favorite game!';
 ---
 
-<Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
+<Layout title={title}>
     <div class="py-8">
         <PageHero
             title="Welcome to Tailspin Toys"
@@ -21,8 +27,25 @@ const games = await getAllGames(getDatabase());
         <div>
             <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
 
-            {games.length === 0 ? (
+            <CatalogFilters filters={filters} />
+
+            <p class="mb-6 text-sm text-slate-400" data-testid="results-count">
+                Showing {games.length} of {total} games
+            </p>
+
+            {total === 0 ? (
                 <EmptyState text="No games available at the moment." />
+            ) : games.length === 0 ? (
+                <EmptyState>
+                    <p data-testid="no-matching-games" class="text-slate-300">No games match these filters.</p>
+                    <a
+                        href="/"
+                        class="inline-block mt-3 px-2 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800"
+                        data-testid="no-matching-games-clear-filters"
+                    >
+                        Clear filters
+                    </a>
+                </EmptyState>
             ) : (
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
                     {games.map((game) => <GameCard game={game} />)}
