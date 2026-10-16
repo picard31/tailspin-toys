@@ -83,6 +83,21 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 }
 
 /**
+ * The games of one publisher, for its publisher page.
+ *
+ * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
+ * @param publisherId - The publisher's primary key.
+ * @returns The publisher's games sorted by title, each with its category and publisher; an empty
+ *   list when the publisher has no game or does not exist.
+ */
+export async function getPublisherGames(db: Database, publisherId: number): Promise<Game[]> {
+    const rows = await baseGamesQuery(db)
+        .where(eq(games.publisherId, publisherId))
+        .orderBy(asc(games.title));
+    return rows.map(mapGame);
+}
+
+/**
  * A single game by id.
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.

@@ -1,0 +1,55 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import GameCard from '../../components/GameCard.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import Button from '../../components/Button.astro';
+import ArrowLeft from '../../assets/icons/arrow-left.svg';
+import { getDatabase } from '../../lib/db';
+import { getPublisherIds, getPublisherPage } from '../../lib/publisher-page';
+
+// Prerendered like a game's page: unlike the home page, it reads no query string (ADR 0007).
+export const prerender = true;
+
+export const getStaticPaths = (async () => {
+    const ids = await getPublisherIds(getDatabase());
+    return ids.map((id) => ({ params: { id: String(id) } }));
+}) satisfies GetStaticPaths;
+
+const { id } = Astro.params;
+const page = await getPublisherPage(getDatabase(), Number(id));
+
+if (!page) {
+    return Astro.redirect('/404');
+}
+
+const { publisher, games } = page;
+---
+
+<Layout title={`${publisher.name} - Tailspin Toys`}>
+    <div class="py-8" data-testid="publisher-page">
+        <PageHero title={publisher.name} subtitle={publisher.description ?? undefined} />
+
+        <div>
+            <h2 class="text-2xl font-medium mb-6 text-slate-100">Games by {publisher.name}</h2>
+
+            {games.length === 0 ? (
+                <EmptyState>
+                    <p data-testid="publisher-no-games" class="text-slate-300">This publisher has no games yet.</p>
+                </EmptyState>
+            ) : (
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="publisher-games">
+                    {games.map((game) => <GameCard game={game} />)}
+                </div>
+            )}
+        </div>
+
+        <div class="mt-8">
+            <Button href="/" size="sm" data-testid="publisher-back-link">
+                <ArrowLeft class="h-5 w-5 mr-2" aria-hidden="true" />
+                Back to all games
+            </Button>
+        </div>
+    </div>
+</Layout>

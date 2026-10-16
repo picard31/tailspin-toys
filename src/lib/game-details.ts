@@ -3,8 +3,14 @@ import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { GameDetails } from '../types/game';
 
-/** A description worth showing, or null when it is missing, empty or only whitespace. */
-function shownDescription(description: string | null): string | null {
+/**
+ * A description worth showing. A game's page and a publisher's page share it, so that a
+ * publisher's description is shown on both or on neither.
+ *
+ * @param description - A category or publisher description, as stored.
+ * @returns The description, or `null` when it is missing, empty or only whitespace.
+ */
+export function shownDescription(description: string | null): string | null {
     return description !== null && description.trim().length > 0 ? description : null;
 }
 

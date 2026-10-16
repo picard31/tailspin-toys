@@ -33,7 +33,7 @@ Ce ticket pose toute la lecture des données. Il n'utilise aucun code du Filtre 
   - [ ] `getPublisherPage(db, id)`, qui rend l'Éditeur, avec sa description passée par `shownDescription`, et ses Jeux lus par `getPublisherGames`, ou `null` quand aucun Éditeur n'a cet identifiant.
 
   Chaque fonction exportée a son TSDoc.
-- [ ] Le module des types ne change pas. Aucun code de la 07.2 n'est utilisé (`getAllPublishers`, `getCatalogGames`, `getCatalog`). Aucun changement de schéma, de seed, de CSV ni de migration.
+- [ ] Le module des types ne gagne aucun type : seul le commentaire de `PublisherDetails` s'élargit à la Page Éditeur. Aucun code de la 07.2 n'est utilisé (`getAllPublishers`, `getCatalogGames`, `getCatalog`). Aucun changement de schéma, de seed, de CSV ni de migration.
 - [ ] Le fichier de test du module de la Page Éditeur prouve, sur une base en mémoire créée par `createTestDatabase()`, avec des Éditeurs et des Jeux insérés dans l'ordre inverse de l'ordre attendu :
   - [ ] que `getPublisherPage` rend le nom, la description et les seuls Jeux de cet Éditeur, alors qu'un autre Éditeur a des Jeux dans la même base ;
   - [ ] que ces Jeux sont triés par titre de A à Z, chacun avec sa Catégorie et son Éditeur ;

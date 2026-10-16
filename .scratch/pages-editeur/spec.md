@@ -72,7 +72,7 @@ Chaque Éditeur a sa Page Éditeur, à l'adresse `/publisher/<id>`. Sur la Fiche
   - le type `PublisherPage`, `{ publisher: PublisherDetails; games: Game[] }`, déclaré dans ce module, comme `Catalog` l'est dans le module des Jeux ;
   - `getPublisherIds(db): Promise<number[]>` : les identifiants de tous les Éditeurs, triés par nom, pour `getStaticPaths` ;
   - `getPublisherPage(db, id): Promise<PublisherPage | null>` : l'Éditeur, avec sa description passée par `shownDescription`, et ses Jeux lus par `getPublisherGames`. Elle rend `null` quand aucun Éditeur n'a cet identifiant.
-- Les types `PublisherDetails` et `Game` servent tels quels. Le module des types ne change pas.
+- Les types `PublisherDetails` et `Game` servent tels quels. Le module des types ne gagne aucun type : seul le commentaire de `PublisherDetails` s'élargit, puisque la Page Éditeur l'affiche aussi.
 
 ### La Page Éditeur
 
@@ -146,7 +146,7 @@ Chaque Éditeur a sa Page Éditeur, à l'adresse `/publisher/<id>`. Sur la Fiche
 
 - Le seed crée quatre Éditeurs, avec cinq ou six Jeux chacun, et donne à chacun une description de remplissage. Seul Vitest prouve l'Éditeur sans Jeu et la description `null` ; on ne les voit pas sur `npm run dev`.
 - Prérendue, la Page Éditeur montre la base telle qu'elle était au build, comme la Fiche, alors que l'accueil la lit à chaque visite. Après un changement du CSV, il faut supprimer `tailspin.db` et reconstruire le site.
-- `backlog/dev-plan.md` range `src/types/game.ts` (`PublisherDetails`) parmi les fichiers du 04. Finalement, le module des types ne change pas : `PublisherPage` vit dans le module de la Page Éditeur.
+- `backlog/dev-plan.md` range `src/types/game.ts` (`PublisherDetails`) parmi les fichiers du 04. Finalement, le module des types ne gagne aucun type : `PublisherPage` vit dans le module de la Page Éditeur, et seul le commentaire de `PublisherDetails` change.
 - Fusion de la vague 2 : aucun conflit attendu.
   - La fonction ajoutée au module des Jeux va dans une zone que les specs du 02 et du 05 réservent au 04.
   - Le module de la Fiche, la Fiche elle-même et les nouveaux fichiers ne sont touchés par aucune autre branche.
