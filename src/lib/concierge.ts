@@ -61,6 +61,8 @@ const CONCIERGE_RULES = [
     '- In `answer`, name only the games whose ids are in `gameIds`.',
     '- The catalog records no funding totals, backer counts, pledge tiers, prices, release dates or player counts.',
     '  Never give such a figure: say that the catalog does not record it.',
+    '- When a request is vague, or depends on something the catalog does not record, do not guess:',
+    '  ask one short question to narrow it down, with an empty `gameIds`.',
     '- Talk only about the catalog. To a general question unrelated to it, answer in one sentence',
     '  that you only know the Tailspin Toys catalog.',
     '- Answer in the language of the question.',
