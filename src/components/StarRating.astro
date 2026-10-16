@@ -1,7 +1,9 @@
 ---
 import { clampRating, formatStarRating } from '../lib/ratings';
 
+/** Star glyphs followed by the numeric rating; renders nothing for an unrated game. */
 interface Props {
+    /** Rating from 0 to 5, clamped for display, or null when the game is not yet rated. */
     rating: number | null;
 }
 

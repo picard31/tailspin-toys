@@ -185,13 +185,22 @@ function recommendedGames(catalog: CatalogExport, gameIds: number[]): CatalogGam
 
 /**
  * Everything `POST /api/concierge` does, except calling the model: check the key, read the
- * question, build the catalog and the system prompt, ask the model and shape its answer.
+ * conversation, build the catalog and the system prompt, ask the model and shape its answer.
+ * It is the route's only seam, so that Vitest proves all of it without calling the API.
+ *
+ * @param db - Injected: the route passes `getDatabase()`, tests an in-memory database.
+ * @param body - The raw request body; reading its JSON is part of what is checked.
+ * @param options - The key read by the route, and the function that asks the model.
+ * @returns The HTTP status and JSON body to send: 200 with the answer and the recommended games
+ *   as the catalog describes them, 400 for an invalid conversation, 502 when the model fails or
+ *   answers off-schema, 503 without a key. `askModel` is only called for a 200 or a 502.
  */
 export async function answerConcierge(
     db: Database,
     body: string,
-    { apiKey, askModel }: ConciergeOptions,
+    options: ConciergeOptions,
 ): Promise<ConciergeResult> {
+    const { apiKey, askModel } = options;
     if (!apiKey) {
         return { status: 503, body: { error: NOT_CONFIGURED } };
     }

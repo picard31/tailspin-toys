@@ -8,207 +8,207 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
 ---
 
 <Layout title="Backer Concierge - Tailspin Toys">
-  <div class="py-8 max-w-3xl">
-    <PageHero
-      title="Backer Concierge"
-      subtitle="Ask a question about our games. The Concierge only knows the Tailspin Toys catalog."
-    />
-
-    <noscript>
-      <p class="mb-6 p-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-300">
-        The Backer Concierge needs JavaScript. Please enable it to ask a question.
-      </p>
-    </noscript>
-
-    <div
-      role="log"
-      aria-label="Conversation with the Backer Concierge"
-      class="space-y-4 mb-4"
-      data-testid="concierge-log"
-    ></div>
-
-    <p
-      role="status"
-      aria-live="polite"
-      class="min-h-6 mb-4 text-sm text-slate-400"
-      data-testid="concierge-status"
-    ></p>
-
-    <form
-      class="p-6 bg-slate-800/60 rounded-xl border border-slate-700/50"
-      data-testid="concierge-form"
-    >
-      <label for="concierge-question" class="block mb-2 text-sm font-medium text-slate-100">Your question</label>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input
-          id="concierge-question"
-          name="question"
-          type="text"
-          maxlength="500"
-          autocomplete="off"
-          class:list={['flex-1 px-4 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500', focusRing]}
-          data-testid="concierge-question"
+    <div class="py-8 max-w-3xl">
+        <PageHero
+            title="Backer Concierge"
+            subtitle="Ask a question about our games. The Concierge only knows the Tailspin Toys catalog."
         />
-        <button
-          type="submit"
-          class:list={['px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors', focusRing]}
-          data-testid="concierge-ask"
+
+        <noscript>
+            <p class="mb-6 p-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-300">
+                The Backer Concierge needs JavaScript. Please enable it to ask a question.
+            </p>
+        </noscript>
+
+        <div
+            role="log"
+            aria-label="Conversation with the Backer Concierge"
+            class="space-y-4 mb-4"
+            data-testid="concierge-log"
+        ></div>
+
+        <p
+            role="status"
+            aria-live="polite"
+            class="min-h-6 mb-4 text-sm text-slate-400"
+            data-testid="concierge-status"
+        ></p>
+
+        <form
+            class="p-6 bg-slate-800/60 rounded-xl border border-slate-700/50"
+            data-testid="concierge-form"
         >
-          Ask
-        </button>
-      </div>
-      <button
-        type="button"
-        class:list={['mt-4 px-3 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline', focusRing]}
-        data-testid="concierge-reset"
-      >
-        New conversation
-      </button>
-    </form>
-  </div>
+            <label for="concierge-question" class="block mb-2 text-sm font-medium text-slate-100">Your question</label>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input
+                    id="concierge-question"
+                    name="question"
+                    type="text"
+                    maxlength="500"
+                    autocomplete="off"
+                    class:list={['flex-1 px-4 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500', focusRing]}
+                    data-testid="concierge-question"
+                />
+                <button
+                    type="submit"
+                    class:list={['px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors', focusRing]}
+                    data-testid="concierge-ask"
+                >
+                    Ask
+                </button>
+            </div>
+            <button
+                type="button"
+                class:list={['mt-4 px-3 py-1 rounded text-sm text-blue-400 hover:text-blue-300 hover:underline', focusRing]}
+                data-testid="concierge-reset"
+            >
+                New conversation
+            </button>
+        </form>
+    </div>
 </Layout>
 
 <script>
-  /** A recommended game, as the catalog export describes it. */
-  interface RecommendedGame {
-    id: number;
-    title: string;
-    category: string;
-    publisher: string;
-    starRating?: number;
-    ratingLabel: string;
-  }
-
-  interface ConciergeReply {
-    answer?: unknown;
-    games?: unknown;
-    error?: unknown;
-  }
-
-  interface ConciergeMessage {
-    role: 'user' | 'assistant';
-    content: string;
-  }
-
-  const UNREACHABLE = 'The Backer Concierge could not be reached. Please try again.';
-
-  const form = document.querySelector<HTMLFormElement>('[data-testid="concierge-form"]');
-  const field = document.querySelector<HTMLInputElement>('[data-testid="concierge-question"]');
-  const ask = document.querySelector<HTMLButtonElement>('[data-testid="concierge-ask"]');
-  const log = document.querySelector<HTMLElement>('[data-testid="concierge-log"]');
-  const status = document.querySelector<HTMLElement>('[data-testid="concierge-status"]');
-  const reset = document.querySelector<HTMLButtonElement>('[data-testid="concierge-reset"]');
-
-  /** A labelled block of plain text: text is never interpreted as HTML. */
-  function entry(label: string, text: string, classes: string, testId?: string): HTMLElement {
-    const block = document.createElement('div');
-    block.className = `p-4 rounded-xl border ${classes}`;
-    const heading = document.createElement('p');
-    heading.className = 'text-xs font-medium uppercase tracking-wide text-slate-400 mb-1';
-    heading.textContent = label;
-    const body = document.createElement('p');
-    body.className = 'whitespace-pre-line text-slate-100';
-    body.textContent = text;
-    if (testId) {
-      body.dataset.testid = testId;
+    /** A recommended game, as the catalog export describes it. */
+    interface RecommendedGame {
+        id: number;
+        title: string;
+        category: string;
+        publisher: string;
+        starRating?: number;
+        ratingLabel: string;
     }
-    block.append(heading, body);
-    return block;
-  }
 
-  /** The recommendations under an answer: a link to each game's page, with its category, publisher and rating. */
-  function recommendationList(games: RecommendedGame[]): HTMLElement {
-    const list = document.createElement('ul');
-    list.className = 'mt-3 space-y-2';
-    list.setAttribute('aria-label', 'Recommended games');
-    for (const game of games) {
-      const item = document.createElement('li');
-      item.className = 'p-3 rounded-lg bg-slate-800/60 border border-slate-700/50';
-      item.dataset.testid = 'concierge-game';
-      const link = document.createElement('a');
-      link.href = `/game/${game.id}`;
-      link.className =
-        'font-semibold text-blue-400 hover:text-blue-300 hover:underline rounded focus:outline-none focus:ring-2 focus:ring-blue-500';
-      link.textContent = game.title;
-      const rating = game.starRating === undefined ? game.ratingLabel : `${game.ratingLabel} ${game.starRating.toFixed(1)}`;
-      const details = document.createElement('p');
-      details.className = 'text-sm text-slate-400';
-      details.textContent = `${game.category} · ${game.publisher} · ${rating}`;
-      item.append(link, details);
-      list.append(item);
+    interface ConciergeReply {
+        answer?: unknown;
+        games?: unknown;
+        error?: unknown;
     }
-    return list;
-  }
 
-  /** Send the whole conversation to the route; a network failure reads as an error reply. */
-  async function askConcierge(messages: ConciergeMessage[]): Promise<{ ok: boolean; reply: ConciergeReply }> {
-    try {
-      const response = await fetch('/api/concierge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages }),
-      });
-      return { ok: response.ok, reply: (await response.json()) as ConciergeReply };
-    } catch {
-      return { ok: false, reply: { error: UNREACHABLE } };
+    interface ConciergeMessage {
+        role: 'user' | 'assistant';
+        content: string;
     }
-  }
 
-  if (form && field && ask && log && status && reset) {
-    let pending = false;
-    // The conversation lives in the page only: nothing is kept on the server, and a reload forgets it.
-    const history: ConciergeMessage[] = [];
-    // Bumped by "New conversation", so that a reply to the previous conversation is dropped.
-    let conversation = 0;
+    const UNREACHABLE = 'The Backer Concierge could not be reached. Please try again.';
 
-    reset.addEventListener('click', () => {
-      conversation += 1;
-      history.length = 0;
-      log.replaceChildren();
-      status.textContent = '';
-      ask.removeAttribute('aria-disabled');
-      pending = false;
-      field.focus();
-    });
+    const form = document.querySelector<HTMLFormElement>('[data-testid="concierge-form"]');
+    const field = document.querySelector<HTMLInputElement>('[data-testid="concierge-question"]');
+    const ask = document.querySelector<HTMLButtonElement>('[data-testid="concierge-ask"]');
+    const log = document.querySelector<HTMLElement>('[data-testid="concierge-log"]');
+    const status = document.querySelector<HTMLElement>('[data-testid="concierge-status"]');
+    const reset = document.querySelector<HTMLButtonElement>('[data-testid="concierge-reset"]');
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      // One question at a time: the button does not send a second one while waiting.
-      if (pending) {
-        return;
-      }
-      pending = true;
-      ask.setAttribute('aria-disabled', 'true');
-      status.textContent = 'Thinking…';
-
-      const question = field.value;
-      log.append(entry('You', question, 'bg-slate-800 border-slate-700'));
-      const asked: ConciergeMessage = { role: 'user', content: question };
-      const askedIn = conversation;
-      const { ok, reply } = await askConcierge([...history, asked]);
-      if (askedIn !== conversation) {
-        return;
-      }
-
-      if (ok && typeof reply.answer === 'string') {
-        // Only an answered question enters the history, followed by the answer's text.
-        history.push(asked, { role: 'assistant', content: reply.answer });
-        const answer = entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer');
-        const games = Array.isArray(reply.games) ? (reply.games as RecommendedGame[]) : [];
-        if (games.length > 0) {
-          answer.append(recommendationList(games));
+    /** A labelled block of plain text: text is never interpreted as HTML. */
+    function entry(label: string, text: string, classes: string, testId?: string): HTMLElement {
+        const block = document.createElement('div');
+        block.className = `p-4 rounded-xl border ${classes}`;
+        const heading = document.createElement('p');
+        heading.className = 'text-xs font-medium uppercase tracking-wide text-slate-400 mb-1';
+        heading.textContent = label;
+        const body = document.createElement('p');
+        body.className = 'whitespace-pre-line text-slate-100';
+        body.textContent = text;
+        if (testId) {
+            body.dataset.testid = testId;
         }
-        log.append(answer);
-        field.value = '';
-      } else {
-        const message = typeof reply.error === 'string' ? reply.error : UNREACHABLE;
-        log.append(entry('Backer Concierge', message, 'bg-red-950/40 border-red-900', 'concierge-error'));
-      }
+        block.append(heading, body);
+        return block;
+    }
 
-      status.textContent = '';
-      ask.removeAttribute('aria-disabled');
-      pending = false;
-      field.focus();
-    });
-  }
+    /** The recommendations under an answer: a link to each game's page, with its category, publisher and rating. */
+    function recommendationList(games: RecommendedGame[]): HTMLElement {
+        const list = document.createElement('ul');
+        list.className = 'mt-3 space-y-2';
+        list.setAttribute('aria-label', 'Recommended games');
+        for (const game of games) {
+            const item = document.createElement('li');
+            item.className = 'p-3 rounded-lg bg-slate-800/60 border border-slate-700/50';
+            item.dataset.testid = 'concierge-game';
+            const link = document.createElement('a');
+            link.href = `/game/${game.id}`;
+            link.className =
+                'font-semibold text-blue-400 hover:text-blue-300 hover:underline rounded focus:outline-none focus:ring-2 focus:ring-blue-500';
+            link.textContent = game.title;
+            const rating = game.starRating === undefined ? game.ratingLabel : `${game.ratingLabel} ${game.starRating.toFixed(1)}`;
+            const details = document.createElement('p');
+            details.className = 'text-sm text-slate-400';
+            details.textContent = `${game.category} · ${game.publisher} · ${rating}`;
+            item.append(link, details);
+            list.append(item);
+        }
+        return list;
+    }
+
+    /** Send the whole conversation to the route; a network failure reads as an error reply. */
+    async function askConcierge(messages: ConciergeMessage[]): Promise<{ ok: boolean; reply: ConciergeReply }> {
+        try {
+            const response = await fetch('/api/concierge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages }),
+            });
+            return { ok: response.ok, reply: (await response.json()) as ConciergeReply };
+        } catch {
+            return { ok: false, reply: { error: UNREACHABLE } };
+        }
+    }
+
+    if (form && field && ask && log && status && reset) {
+        let pending = false;
+        // The conversation lives in the page only: nothing is kept on the server, and a reload forgets it.
+        const history: ConciergeMessage[] = [];
+        // Bumped by "New conversation", so that a reply to the previous conversation is dropped.
+        let conversation = 0;
+
+        reset.addEventListener('click', () => {
+            conversation += 1;
+            history.length = 0;
+            log.replaceChildren();
+            status.textContent = '';
+            ask.removeAttribute('aria-disabled');
+            pending = false;
+            field.focus();
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            // One question at a time: the button does not send a second one while waiting.
+            if (pending) {
+                return;
+            }
+            pending = true;
+            ask.setAttribute('aria-disabled', 'true');
+            status.textContent = 'Thinking…';
+
+            const question = field.value;
+            log.append(entry('You', question, 'bg-slate-800 border-slate-700'));
+            const asked: ConciergeMessage = { role: 'user', content: question };
+            const askedIn = conversation;
+            const { ok, reply } = await askConcierge([...history, asked]);
+            if (askedIn !== conversation) {
+                return;
+            }
+
+            if (ok && typeof reply.answer === 'string') {
+                // Only an answered question enters the history, followed by the answer's text.
+                history.push(asked, { role: 'assistant', content: reply.answer });
+                const answer = entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer');
+                const games = Array.isArray(reply.games) ? (reply.games as RecommendedGame[]) : [];
+                if (games.length > 0) {
+                    answer.append(recommendationList(games));
+                }
+                log.append(answer);
+                field.value = '';
+            } else {
+                const message = typeof reply.error === 'string' ? reply.error : UNREACHABLE;
+                log.append(entry('Backer Concierge', message, 'bg-red-950/40 border-red-900', 'concierge-error'));
+            }
+
+            status.textContent = '';
+            ask.removeAttribute('aria-disabled');
+            pending = false;
+            field.focus();
+        });
+    }
 </script>
