@@ -52,7 +52,7 @@ Les dépendances, une par ligne :
 
 ## Fusionner la vague 2
 
-01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, et un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie ; 02 modifie le `orderBy` de la même fonction. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et mettre les autres à jour avec `picard31/main` après chaque fusion.
+01 et 07.2 ajoutent chacun une condition dans le même `and(...)` de `getCatalogGames`, dont 02 modifie le `orderBy`, et tous trois ajoutent un contrôle dans `CatalogFilters.astro` ; 07.3 ne touche que les fichiers de la famille Catégorie. Les conflits attendus tiennent en une ligne et se règlent à la main. Fusionner les branches une à une, et mettre les autres à jour avec `picard31/main` après chaque fusion.
 
 Chaque ticket qui ajoute un terme du domaine l'écrit dans `GLOSSARY.md`, seul conflit de la vague 1. Placer chaque terme à côté de ses voisins de sens, plutôt qu'à la fin du fichier où toutes les branches écriraient au même endroit, réduit les conflits sans les exclure. Un conflit restant se règle à la main : garder les entrées des deux côtés, et une seule fois une entrée identique des deux côtés.
 
@@ -61,7 +61,7 @@ Chaque ticket qui ajoute un terme du domaine l'écrit dans `GLOSSARY.md`, seul c
 - **L'ADR 0001 est sur `main`** depuis la PR #2, avec la spec du 07, découpée en quatre tickets sous `.scratch/filtrer-les-jeux/`. La recherche (01), le tri (02) et la pagination (06) s'appuient sur l'accueil rendu à la demande, jamais sur un filtrage dans le navigateur, une option que l'ADR écarte.
 - **07.1 est fusionnée** (PR #2) : la vague 2 part de `picard31/main`, où vivent `getCatalog`, `getCatalogGames` et `CatalogFilters.astro`.
 - **09 est tranché** : l'API Claude (`claude-opus-5-5`), une clé de formation dans `.env`, pas de recherche web (spec `.scratch/backer-concierge/spec.md`, ADR 0003). Avant la vague, le formateur crée la clé, la plafonne en dépenses et la distribue ; il la révoque après la session.
-- **Le piège du 04** : `src/components/GameCard.astro` est un grand lien `<a>`. Un lien vers l'éditeur à l'intérieur serait un lien imbriqué dans un lien, du HTML invalide. Le mettre sur la fiche de jeu, ce que le critère permet (« and/or »). Le 04 réutilise aussi `getGameDetails` (`src/lib/game-details.ts`), qui reprend la sélection et les jointures de `src/lib/games.ts` parce que le 03 ne devait pas toucher ce fichier : le 04 peut les factoriser, pour que les deux requêtes ne divergent pas.
+- **Le piège du 04** : `src/components/GameCard.astro` est un grand lien `<a>`. Un lien vers l'éditeur à l'intérieur serait un lien imbriqué dans un lien, du HTML invalide. Le mettre sur la fiche de jeu, ce que le critère permet (« and/or »). Le 04 réutilise aussi `getGameDetails` (`src/lib/game-details.ts`), qui reprend la sélection et les jointures de `src/lib/games.ts` parce que le 03 ne devait pas toucher ce fichier. Les factoriser, pour que les deux requêtes ne divergent pas, toucherait `src/lib/games.ts`, que 01, 02 et 07.2 modifient dans la même vague : à faire après leur fusion, dans une PR à part, plutôt que dans le 04.
 - **Les tickets de la vague 1 sont sous `.scratch/`**, comme l'attend `docs/agents/issue-tracker.md` :
   - 07.1 : `.scratch/filtrer-les-jeux/issues/01-une-categorie.md` ;
   - 03 : `.scratch/descriptions-fiche-de-jeu/issues/01-descriptions.md` ;
