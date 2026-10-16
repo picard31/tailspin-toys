@@ -1,5 +1,4 @@
 /**
- * Centralized type definitions for game-related data structures.
  * These interfaces describe the shape returned by the Drizzle data-access
  * helpers in `src/lib/games.ts` and consumed by Astro pages/components.
  */

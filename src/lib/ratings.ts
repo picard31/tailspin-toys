@@ -3,11 +3,15 @@
  *
  * Kept framework-free and side-effect-free so the logic is unit-testable
  * without the Astro runtime (see `ratings.test.ts`). Consumed by the
- * `StarRating.astro` component.
+ * `StarRating.astro` component and by the catalog export (`db/export-catalog.ts`).
  */
 
 /**
- * Clamps a rating into the displayable 0–5 range.
+ * Clamps a rating into the displayable 0–5 range, so a bad value in the
+ * database never draws more than five stars.
+ *
+ * @param rating - Any rating, possibly out of range.
+ * @returns The rating, raised to 0 or lowered to 5 when outside that range.
  */
 export function clampRating(rating: number): number {
     return Math.min(5, Math.max(0, rating));
@@ -16,9 +20,12 @@ export function clampRating(rating: number): number {
 /**
  * Builds a star glyph string for a rating between 0 and 5.
  *
- * Renders full (★), an optional half (½) and empty (☆) stars. Returns
- * `'Not yet rated'` when the rating is `null`. Ratings are clamped to the
- * 0–5 range so the output always contains exactly five star positions.
+ * Ratings are clamped to the 0–5 range so the output always contains exactly
+ * five star positions.
+ *
+ * @param rating - Rating to draw, or null for a game nobody has rated yet.
+ * @returns Full (★), an optional half (½) and empty (☆) stars, or
+ * `'Not yet rated'` when the rating is null.
  */
 export function formatStarRating(rating: number | null): string {
     if (rating === null) return 'Not yet rated';
