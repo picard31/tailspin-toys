@@ -128,11 +128,12 @@ describe('getPublisherIds', () => {
 
     it('includes a publisher with no game', async () => {
         const categoryId = await insertCategory(db);
-        const withGame = await insertPublisher(db, 'Pub One');
-        const withoutGame = await insertPublisher(db, 'Pub Two');
+        // The publisher with no game comes last in insertion order but first by name.
+        const withGame = await insertPublisher(db, 'Pub Two');
+        const withoutGame = await insertPublisher(db, 'Pub One');
         await insertGames(db, ['Game 01'], categoryId, withGame);
 
-        expect(await getPublisherIds(db)).toEqual([withGame, withoutGame]);
+        expect(await getPublisherIds(db)).toEqual([withoutGame, withGame]);
     });
 
     it('sorts the ids by publisher name', async () => {
