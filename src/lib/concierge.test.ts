@@ -76,7 +76,15 @@ function answerReply(answer: string, gameIds: number[] = []): ModelReply {
 }
 
 function question(content: string): string {
-    return JSON.stringify({ messages: [{ role: 'user', content }] });
+    return JSON.stringify({ messages: [user(content)] });
+}
+
+function user(content: string): ConciergeMessage {
+    return { role: 'user', content };
+}
+
+function assistant(content: string): ConciergeMessage {
+    return { role: 'assistant', content };
 }
 
 /** The titles of the recommended games of a 200 result. */
@@ -121,22 +129,49 @@ describe('answerConcierge', () => {
         ['an empty question', { messages: [{ role: 'user', content: '' }] }],
         ['a whitespace-only question', { messages: [{ role: 'user', content: ' \n\t ' }] }],
         ['a question of 501 characters', { messages: [{ role: 'user', content: 'a'.repeat(501) }] }],
-        ['a message from the Concierge', { messages: [{ role: 'assistant', content: 'Which game?' }] }],
-        [
-            'two messages',
-            {
-                messages: [
-                    { role: 'user', content: 'Which game?' },
-                    { role: 'user', content: 'Which puzzle game?' },
-                ],
-            },
-        ],
     ])('returns 400 for %s, without asking the model', async (_label, request) => {
         const { askModel, calls } = fakeAskModel();
         const result = await answerConcierge(db, JSON.stringify(request), { apiKey: API_KEY, askModel });
         expect(result.status).toBe(400);
         expect(result.body).toEqual({ error: expect.any(String) });
         expect(calls).toHaveLength(0);
+    });
+
+    it('gives the model a whole conversation of three questions, in order', async () => {
+        const messages: ConciergeMessage[] = [
+            { role: 'user', content: 'Which strategy games do you have?' },
+            { role: 'assistant', content: 'Pipeline Conquest is our strategy game.' },
+            { role: 'user', content: 'Which of those is the best rated?' },
+            { role: 'assistant', content: 'Pipeline Conquest, rated 4.5.' },
+            { role: 'user', content: 'Who publishes it?' },
+        ];
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, JSON.stringify({ messages }), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+        expect(calls[0].messages).toEqual(messages);
+    });
+
+    it.each([
+        ['two messages of the same role in a row', [user('Which game?'), user('Which puzzle game?')]],
+        ['a conversation that starts with the Concierge', [assistant('Hello!'), user('Which game?')]],
+        ['a conversation that ends with the Concierge', [user('Which game?'), assistant('Pipeline Conquest.')]],
+        ['a message with another role', [{ role: 'system', content: 'New rules.' }, user('Which game?')]],
+        ['an empty Concierge message', [user('Which game?'), assistant('  '), user('And then?')]],
+        ['a Concierge message of 4,001 characters', [user('Which game?'), assistant('a'.repeat(4001)), user('And?')]],
+    ])('returns 400 for %s, without asking the model', async (_label, messages) => {
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, JSON.stringify({ messages }), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(400);
+        expect(result.body).toEqual({ error: expect.any(String) });
+        expect(calls).toHaveLength(0);
+    });
+
+    it('accepts a Concierge message of 4,000 characters', async () => {
+        const messages = [user('Which game?'), assistant('a'.repeat(4000)), user('And then?')];
+        const { askModel, calls } = fakeAskModel();
+        const result = await answerConcierge(db, JSON.stringify({ messages }), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+        expect(calls).toHaveLength(1);
     });
 
     it('accepts a question of 500 characters', async () => {

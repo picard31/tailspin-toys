@@ -78,6 +78,11 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
     error?: unknown;
   }
 
+  interface ConciergeMessage {
+    role: 'user' | 'assistant';
+    content: string;
+  }
+
   const UNREACHABLE = 'The Backer Concierge could not be reached. Please try again.';
 
   const form = document.querySelector<HTMLFormElement>('[data-testid="concierge-form"]');
@@ -127,13 +132,13 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
     return list;
   }
 
-  /** Send the question to the route; a network failure reads as an error reply. */
-  async function askConcierge(question: string): Promise<{ ok: boolean; reply: ConciergeReply }> {
+  /** Send the whole conversation to the route; a network failure reads as an error reply. */
+  async function askConcierge(messages: ConciergeMessage[]): Promise<{ ok: boolean; reply: ConciergeReply }> {
     try {
       const response = await fetch('/api/concierge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: question }] }),
+        body: JSON.stringify({ messages }),
       });
       return { ok: response.ok, reply: (await response.json()) as ConciergeReply };
     } catch {
@@ -143,6 +148,8 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
 
   if (form && field && ask && log && status) {
     let pending = false;
+    // The conversation lives in the page only: nothing is kept on the server, and a reload forgets it.
+    const history: ConciergeMessage[] = [];
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -156,9 +163,12 @@ const focusRing = 'focus:outline-none focus:ring-2 focus:ring-blue-500';
 
       const question = field.value;
       log.append(entry('You', question, 'bg-slate-800 border-slate-700'));
-      const { ok, reply } = await askConcierge(question);
+      const asked: ConciergeMessage = { role: 'user', content: question };
+      const { ok, reply } = await askConcierge([...history, asked]);
 
       if (ok && typeof reply.answer === 'string') {
+        // Only an answered question enters the history, followed by the answer's text.
+        history.push(asked, { role: 'assistant', content: reply.answer });
         const answer = entry('Backer Concierge', reply.answer, 'bg-blue-950/40 border-blue-900', 'concierge-answer');
         const games = Array.isArray(reply.games) ? (reply.games as RecommendedGame[]) : [];
         if (games.length > 0) {
