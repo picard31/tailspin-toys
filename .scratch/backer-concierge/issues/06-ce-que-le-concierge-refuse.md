@@ -32,4 +32,4 @@ Ces comportements viennent du modèle : ce ticket complète le prompt système, 
 
 ## Comments
 
-Livré par la PR #4. Les sept questions restent à vérifier avec une clé.
+Livré par la PR #4. Les six questions, et l'absence de balise Markdown dans les réponses, restent à vérifier avec une clé.

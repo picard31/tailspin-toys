@@ -320,4 +320,10 @@ describe('answerConcierge', () => {
         expect(result.status).toBe(502);
         expect(result.body).toEqual({ error: expect.stringMatching(/try again/i) });
     });
+
+    it('accepts an answer of 4,000 characters', async () => {
+        const { askModel } = fakeAskModel(answerReply('a'.repeat(4000)));
+        const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
+        expect(result.status).toBe(200);
+    });
 });

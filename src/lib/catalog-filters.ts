@@ -31,7 +31,8 @@ export function readCatalogFilters(searchParams: URLSearchParams): CatalogFilter
  *   other than `null`.
  */
 export function hasActiveFilters(filters: CatalogFilters): boolean {
-    // `satisfies` makes typecheck fail on a family of another shape, which this test would misread.
+    // `satisfies` makes typecheck fail on a family that is neither a list of ids nor `number | null`,
+    // which this check would misread. A non-nullable `number` still passes: keep families nullable.
     const values: FilterValue[] = Object.values(filters satisfies Record<keyof CatalogFilters, FilterValue>);
     return values.some((value) => (Array.isArray(value) ? value.length > 0 : value !== null));
 }

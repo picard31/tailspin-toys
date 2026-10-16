@@ -24,3 +24,7 @@ Ce ticket pose la structure que les suivants rempliront : la région de la conve
 - [x] Le champ, le bouton et le lien du menu ont un focus visible, dans le style du projet. La page suit le thème sombre du site.
 - [x] On vérifie à la main, sur `npm run dev` : le lien du menu mène à la page depuis l'accueil, la page À propos et une fiche de Jeu ; au clavier, Tab atteint le lien, le champ et le bouton, avec un focus visible.
 - [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+
+## Comments
+
+Livré par la PR #4. Vérifié à la main sur `npm run dev` : le lien « Backer Concierge » du menu est présent sur l'accueil, la page À propos et une fiche de Jeu (`/game/1`). Depuis À propos, au clavier, le menu s'ouvre, Tab atteint le lien, et Entrée mène à `/concierge`. Sur la page, Tab atteint le champ puis le bouton « Ask », chacun avec son anneau de focus (`focus:ring-2 focus:ring-blue-500`).

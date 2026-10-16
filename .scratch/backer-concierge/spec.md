@@ -84,7 +84,7 @@ La route ne fait que trois choses : lire la clé, fournir un `askModel` branché
 1. Sans clé, rend 503 sans appeler `askModel`.
 2. Lit la conversation : JSON invalide ou règle enfreinte, il rend 400 sans appeler `askModel`.
 3. Construit le Catalogue depuis la base, puis le prompt système qui le contient.
-4. Appelle `askModel`. Si l'appel échoue, si le modèle refuse de répondre ou s'arrête sur la limite de jetons, ou si sa sortie ne respecte pas le schéma, il rend 502.
+4. Appelle `askModel`. Si l'appel échoue, si le modèle refuse de répondre ou s'arrête sur la limite de jetons, si sa sortie ne respecte pas le schéma, ou si sa réponse est vide ou dépasse 4 000 caractères (la page la renverrait dans l'historique, qui la refuserait), il rend 502.
 5. Trie les Recommandations et rend 200.
 
 ### Contrat de la route
@@ -100,7 +100,7 @@ La route ne fait que trois choses : lire la clé, fournir un `askModel` branché
   - 200 : `answer`, le texte de la réponse, et `games`, les Recommandations, telles que l'export du Catalogue décrit un Jeu, dans l'ordre où le modèle les a citées ;
   - 400 : `error`, quand la requête est invalide ou dépasse une limite. Pour la limite de 10 questions, le message invite à commencer une nouvelle conversation ;
   - 503 : `error`, sans clé ;
-  - 502 : `error`, quand le fournisseur échoue, refuse de répondre, s'arrête sur la limite de jetons ou rend une sortie illisible.
+  - 502 : `error`, quand le fournisseur échoue, refuse de répondre, s'arrête sur la limite de jetons, rend une sortie illisible, ou une réponse vide ou de plus de 4 000 caractères.
 - Les messages d'erreur sont en anglais, comme ceux de la route existante.
 - Dans l'historique que renvoie la page, le `content` d'un message du Concierge est le texte de sa réponse.
 
@@ -158,7 +158,7 @@ Construit à partir de l'export du Catalogue, qu'il contient en entier, et déte
   - le prompt reçu par `askModel` contient chaque Jeu de la base, et il est identique pour deux questions sur la même base ;
   - la conversation reçue par `askModel` est celle de la requête ;
   - 200 : les Recommandations viennent de la base, les identifiants inconnus sont écartés, les doublons fusionnés, l'ordre du modèle gardé, et une liste vide donne une réponse sans Recommandation ;
-  - 502 : `askModel` lève une erreur, le modèle refuse de répondre, s'arrête sur la limite de jetons, ou rend une sortie qui ne respecte pas le schéma.
+  - 502 : `askModel` lève une erreur, le modèle refuse de répondre, s'arrête sur la limite de jetons, rend une sortie qui ne respecte pas le schéma, ou une réponse vide ou de plus de 4 000 caractères.
 - Les comportements qui viennent du modèle (refus, question de clarification, langue, réponse hors Catalogue) ne se prouvent pas par Vitest. On les vérifie à la main, sur `npm run dev`, avec la liste de questions de chaque ticket.
 - La page et son script ne passent pas par Vitest. On les vérifie à la main, au clavier.
 - On n'écrit pas de nouveau test e2e et on ne lance pas Playwright.
@@ -192,6 +192,6 @@ La livraison se fait en neuf tickets, sous `issues/`. Chacun se termine avec les
 
 03, 04 et 05 ne dépendent que de 02, mais ils modifient le même module et le même fichier de test : on les livre l'un après l'autre, dans l'ordre des numéros.
 
-Le Concierge se livre en parallèle des tranches 07.1 (filtrage par une Catégorie) et 03 (descriptions sur la fiche), sans fichier commun avec elles.
+Le Concierge se livre en parallèle des tranches 07.1 (filtrage par une Catégorie) et 03 (descriptions sur la fiche), sans fichier de code commun avec elles ; seul `GLOSSARY.md` leur est commun.
 
 Le seam unique revient sur une décision prise pendant le cadrage, selon laquelle aucun test ne simulerait l'appel au modèle : on simule `askModel`, une fonction du projet, et jamais le client du SDK.
