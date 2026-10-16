@@ -11,7 +11,7 @@ paths:
 ESLint applique le format avec `@stylistic/eslint-plugin`, sur le TypeScript, le JavaScript et les fichiers `.astro` (frontmatter, gabarit et `<script>`). Un écart fait échouer `npm run lint`, et `npm run lint -- --fix` le corrige ; en cas de doute, `eslint.config.js` fait foi. Le choix de l'outil est dans `docs/adr/0002-format-impose-par-eslint-stylistic.md`.
 
 - Indentation de 4 espaces ; les `case` d'un `switch` décalés d'un niveau.
-- Apostrophes simples, ou des guillemets pour une chaîne qui contient une apostrophe.
+- Apostrophes simples, ou des guillemets pour une chaîne qui contient une apostrophe. Les attributs HTML du gabarit `.astro` restent entre guillemets (`class="…"`) : la règle ne vise que les chaînes du code.
 - Un point-virgule à la fin de chaque instruction, et après chaque membre d'une interface ou d'un type.
 - Une virgule après le dernier élément d'une liste écrite sur plusieurs lignes : objet, tableau, arguments, paramètres, imports.
 - L'accolade ouvrante en fin de ligne (`} else {`).

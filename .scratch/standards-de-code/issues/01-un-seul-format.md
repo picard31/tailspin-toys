@@ -13,14 +13,19 @@ Ce ticket porte le grand reformatage du ticket 08 : un changement mécanique, qu
 
 ## Critères d'acceptation
 
-- [ ] Les dépendances sont installées par `npm ci` dans le worktree, pas par un lien vers les `node_modules` du checkout principal.
-- [ ] `@stylistic/eslint-plugin` est une dépendance de développement. Ses règles `indent` (4 espaces), `quotes` (simples), `semi`, `comma-dangle` (en multiligne), `no-trailing-spaces` et `eol-last` s'appliquent, en `error`, à tout ce que lit `npm run lint`.
-- [ ] Les règles de format d'ESLint lui-même, dépréciées, ne sont pas utilisées.
-- [ ] `npm run lint -- --fix` a reformaté tout le dépôt : TypeScript, JavaScript des fichiers de configuration, `.astro` (frontmatter, HTML et `<script>`), tests e2e.
-- [ ] Le corps du `<script>` du menu de l'en-tête est indenté d'un niveau dans sa balise, à la main : le correcteur le laisse en escalier, à 2, 6 et 10 espaces.
-- [ ] La réécriture de la configuration ESLint supprime ses quatre libellés de section, qui répètent ce qui suit. Les commentaires sur les worktrees et sur les variables préfixées par `_` restent.
-- [ ] Dans les tests e2e, rien d'autre ne change que des espaces.
-- [ ] Une règle Claude Code **format**, à côté des règles existantes, en français, limitée par `paths:` aux fichiers `.ts`, `.astro`, `.js` et `.mjs`. Elle donne les conventions, dit qu'ESLint les impose, explique l'exception du `<script>` (la lint n'y vérifie que l'indentation relative à sa première ligne : la base d'un niveau se tient à la main) et donne la commande de correction.
-- [ ] `CLAUDE.md` liste `npm run lint -- --fix` parmi ses commandes. Aucun script npm n'est ajouté.
-- [ ] La lint mord : une indentation à 2 espaces, des guillemets doubles et un point-virgule manquant, ajoutés exprès, la font échouer, et `--fix` les corrige. On les retire ensuite.
-- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent, et les tests n'ont changé que de format.
+- [x] Les dépendances sont installées par `npm ci` dans le worktree, pas par un lien vers les `node_modules` du checkout principal.
+- [x] `@stylistic/eslint-plugin` est une dépendance de développement. Ses règles `indent` (4 espaces), `quotes` (simples), `semi`, `comma-dangle` (en multiligne), `no-trailing-spaces` et `eol-last` s'appliquent, en `error`, à tout ce que lit `npm run lint`.
+- [x] Les règles de format d'ESLint lui-même, dépréciées, ne sont pas utilisées.
+- [x] `npm run lint -- --fix` a reformaté tout le dépôt : TypeScript, JavaScript des fichiers de configuration, `.astro` (frontmatter, HTML et `<script>`), tests e2e.
+- [x] Le corps du `<script>` du menu de l'en-tête est indenté d'un niveau dans sa balise, à la main : le correcteur le laisse en escalier, à 2, 6 et 10 espaces.
+- [x] La réécriture de la configuration ESLint supprime ses quatre libellés de section, qui répètent ce qui suit. Les commentaires sur les worktrees et sur les variables préfixées par `_` restent.
+- [x] Dans les tests e2e, rien d'autre ne change que des espaces.
+- [x] Une règle Claude Code **format**, à côté des règles existantes, en français, limitée par `paths:` aux fichiers `.ts`, `.astro`, `.js` et `.mjs`. Elle donne les conventions, dit qu'ESLint les impose, explique l'exception du `<script>` (la lint n'y vérifie que l'indentation relative à sa première ligne : la base d'un niveau se tient à la main) et donne la commande de correction.
+- [x] `CLAUDE.md` liste `npm run lint -- --fix` parmi ses commandes. Aucun script npm n'est ajouté.
+- [x] La lint mord : une indentation à 2 espaces, des guillemets doubles et un point-virgule manquant, ajoutés exprès, la font échouer, et `--fix` les corrige. On les retire ensuite.
+- [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent, et les tests n'ont changé que de format.
+
+## Comments
+
+- Livré par la PR picard31/tailspin-toys#1. Une seule exception à « rien d'autre ne change que des espaces » dans les tests e2e : une virgule finale, dans `accessibility.spec.ts`, ajoutée par `comma-dangle`, une règle que ce ticket impose. Elle ne change aucun comportement.
+- Au-delà des six règles listées, la configuration garde quelques règles Stylistic d'espacement et d'accolades (`brace-style`, `object-curly-spacing`, `member-delimiter-style`…), documentées dans la règle **format**. Elles ne contredisent aucune décision du spec.

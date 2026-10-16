@@ -200,7 +200,7 @@ test.describe('Accessibility Tests', () => {
         const menuButtonSvg = page.locator('#menu-toggle svg');
         await expect(menuButtonSvg).toHaveAttribute('aria-hidden', 'true');
 
-        // One card is enough: every card renders the same icons.
+        // first(): scoped to one card, the check avoids a strict mode violation.
         const firstGameCard = page.locator('[data-testid="game-card"]').first();
         const gameCardSvgs = firstGameCard.locator('svg');
         const count = await gameCardSvgs.count();

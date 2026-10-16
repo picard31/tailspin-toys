@@ -9,6 +9,7 @@ import globals from 'globals';
 const EXPORTED_FUNCTIONS = [
     'ExportNamedDeclaration > FunctionDeclaration',
     'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+    'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > FunctionExpression',
     'ExportDefaultDeclaration > FunctionDeclaration',
 ];
 
@@ -78,7 +79,9 @@ export default [
         plugins: { jsdoc },
         settings: { jsdoc: { mode: 'typescript' } },
         rules: {
+            // No fixer: `--fix` formats code, it never writes documentation.
             'jsdoc/require-jsdoc': ['error', {
+                enableFixer: false,
                 publicOnly: true,
                 require: { FunctionDeclaration: true, ArrowFunctionExpression: true, FunctionExpression: true },
             }],
@@ -99,7 +102,9 @@ export default [
         files: ['src/components/**/*.astro', 'src/layouts/**/*.astro'],
         plugins: { jsdoc },
         rules: {
+            // No fixer: `--fix` would insert an empty comment, and the lint would pass on it.
             'jsdoc/require-jsdoc': ['error', {
+                enableFixer: false,
                 require: { FunctionDeclaration: false },
                 contexts: ['TSInterfaceDeclaration[id.name="Props"] TSPropertySignature'],
             }],

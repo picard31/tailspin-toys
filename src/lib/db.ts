@@ -65,7 +65,7 @@ function createRemoteCallback(sqlite: DatabaseSync): AsyncRemoteCallback {
  *
  * @param sqlite - Raw connection from `createDatabaseConnection`.
  * @param queries - Statements handed over by Drizzle's migrator.
- * @throws The first statement's error, after the rollback.
+ * @throws The error of the statement that failed, once the transaction is rolled back.
  */
 export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[]): void {
     sqlite.exec('BEGIN');
@@ -86,6 +86,7 @@ export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[])
  *
  * @param url - `file:<path>` or `:memory:`; defaults to `DATABASE_URL`, then `file:tailspin.db`.
  * @returns A new client, with its own connection.
+ * @throws When the URL is neither a `file:` URL nor `:memory:`.
  */
 export function createDatabase(url: string = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL): Database {
     return createDatabaseConnection(url).db;
@@ -114,6 +115,7 @@ export function createDatabaseConnection(
  * and on-demand routes such as `/api/games/:id` at request time.
  *
  * @returns The same client on every call, for `DATABASE_URL` or `file:tailspin.db`.
+ * @throws On first use, when `DATABASE_URL` is neither a `file:` URL nor `:memory:`.
  */
 export function getDatabase(): Database {
     if (!cachedDb) {

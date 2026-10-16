@@ -65,4 +65,4 @@ Les props héritées de `HTMLAttributes` (`interface Props extends HTMLAttribute
 
 ## Ce que vérifie ESLint
 
-`npm run lint` échoue sur une fonction exportée de `db/` ou de `src/lib/` sans TSDoc, sans résumé, sans `@param`, sans `@returns` ou sans le tiret, sur un tag qui porte un type, et sur une prop de `Props` sans commentaire. Il vérifie la présence des commentaires, pas leur contenu : ce qu'ils disent reste à la relecture, et c'est le pourquoi qu'il faut écrire.
+`npm run lint` échoue sur une fonction exportée de `db/` ou de `src/lib/` sans TSDoc, sans résumé, sans `@param`, sans `@returns` ou sans le tiret, sur un tag qui porte un type, et sur une prop de `Props` sans commentaire. Il vérifie la présence des commentaires, pas leur contenu : ce qu'ils disent reste à la relecture, et c'est le pourquoi qu'il faut écrire. `npm run lint -- --fix` n'en écrit aucun : un TSDoc ou un commentaire de prop manquant se rédige à la main.

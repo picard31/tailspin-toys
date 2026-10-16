@@ -13,9 +13,9 @@ Il attend 03, qui installe et configure `eslint-plugin-jsdoc` : les deux tickets
 
 ## Critères d'acceptation
 
-- [ ] Sur les composants et les mises en page, `jsdoc/require-jsdoc` est en `error`, avec pour seul contexte les membres de l'interface `Props`. Un prototype a validé ce sélecteur, sur ESLint 10.11 et `eslint-plugin-astro` 3.2.1 : `TSInterfaceDeclaration[id.name='Props'] TSPropertySignature`.
-- [ ] Les Props de l'état vide, de la carte de jeu, du bandeau de page (deux props), de la notation par étoiles et de la mise en page sont documentées. Celles du bouton, du tag et de la carte, déjà documentées, restent telles quelles.
-- [ ] Chaque commentaire dit ce que le composant fait de la prop (« Shown as the hero's `<h1>` »), pas son type. Les props héritées de `HTMLAttributes` ne sont pas concernées.
-- [ ] La règle **commentaires** gagne une section Props : à quoi elle s'applique, ce que dit un commentaire de prop, un exemple, et le fait que la lint vérifie la présence du commentaire mais pas son contenu.
-- [ ] La lint mord : une prop ajoutée sans commentaire la fait échouer. On la retire ensuite.
-- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
+- [x] Sur les composants et les mises en page, `jsdoc/require-jsdoc` est en `error`, avec pour seul contexte les membres de l'interface `Props`. Un prototype a validé ce sélecteur, sur ESLint 10.11 et `eslint-plugin-astro` 3.2.1 : `TSInterfaceDeclaration[id.name='Props'] TSPropertySignature`.
+- [x] Les Props de l'état vide, de la carte de jeu, du bandeau de page (deux props), de la notation par étoiles et de la mise en page sont documentées. Celles du bouton, du tag et de la carte, déjà documentées, restent telles quelles.
+- [x] Chaque commentaire dit ce que le composant fait de la prop (« Shown as the hero's `<h1>` »), pas son type. Les props héritées de `HTMLAttributes` ne sont pas concernées.
+- [x] La règle **commentaires** gagne une section Props : à quoi elle s'applique, ce que dit un commentaire de prop, un exemple, et le fait que la lint vérifie la présence du commentaire mais pas son contenu.
+- [x] La lint mord : une prop ajoutée sans commentaire la fait échouer. On la retire ensuite.
+- [x] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.

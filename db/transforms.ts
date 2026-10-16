@@ -138,7 +138,7 @@ export function gameDescription(rawDescription: string): string {
 /**
  * Distinct category names, so the seed inserts each category once.
  *
- * @param rows - Parsed CSV rows.
+ * @param rows - Rows from `parseGamesCsv`, in CSV order.
  * @returns Category names in first-seen order.
  */
 export function uniqueCategories(rows: GameCsvRow[]): string[] {
@@ -148,7 +148,7 @@ export function uniqueCategories(rows: GameCsvRow[]): string[] {
 /**
  * Distinct publisher names, so the seed inserts each publisher once.
  *
- * @param rows - Parsed CSV rows.
+ * @param rows - Rows from `parseGamesCsv`, in CSV order.
  * @returns Publisher names in first-seen order.
  */
 export function uniquePublishers(rows: GameCsvRow[]): string[] {
