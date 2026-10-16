@@ -1,0 +1,22 @@
+Status: ready-for-agent
+Blocked by: 02
+
+# 05 : Une erreur claire quand le modèle refuse ou répond mal
+
+Spec : la spec du Backer Concierge (`../spec.md`).
+
+## Ce qu'il faut construire
+
+Quand le modèle refuse de répondre, s'arrête avant la fin de sa réponse ou rend une sortie qui ne respecte pas le schéma, le Visiteur lit un message d'erreur clair dans la conversation, au lieu d'une réponse vide ou d'une page cassée. Il peut reposer sa question.
+
+## Critères d'acceptation
+
+- [ ] `answerConcierge` rend 502 avec `{ error }`, un message en anglais qui invite à réessayer, quand :
+  - le modèle refuse de répondre (raison d'arrêt `refusal`) ;
+  - le modèle s'arrête sur la limite de jetons (raison d'arrêt `max_tokens`) ;
+  - la sortie n'a pas d'`answer` texte ;
+  - `gameIds` manque ou n'est pas une liste de nombres entiers.
+- [ ] Une sortie conforme continue de donner 200.
+- [ ] La page affiche ce message dans la conversation, le champ garde la question, et le focus y revient.
+- [ ] Les tests prouvent chacun de ces cas à travers `answerConcierge`, avec un tableau `it.each` et une fausse `askModel` qui rend la raison d'arrêt ou la sortie du cas.
+- [ ] `npm run test:unit`, `npm run lint` et `npm run typecheck` passent.
