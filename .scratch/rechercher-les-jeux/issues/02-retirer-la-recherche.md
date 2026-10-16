@@ -26,3 +26,11 @@ Les deux `href` viennent de `getCatalog`, qui reste le seul appel de la page et 
 ## À la fusion avec le 02 du backlog (Tri)
 
 Le 02 construit le `href` de « Clear filters » par sa propre fonction, qui garde le Tri. La branche fusionnée en second réunit les deux : après fusion, « Clear filters » garde la Recherche **et** le Tri.
+
+Les deux branches exportent une fonction `clearFiltersHref`, sous le même nom et avec deux contrats différents : `clearFiltersHref(search)` dans `src/lib/catalog-search.ts`, rendue par `getCatalog` et passée en prop, et `clearFiltersHref(sort)` dans `src/lib/catalog-sort.ts`, que `CatalogFilters.astro` et `index.astro` appellent eux-mêmes. Garder les deux côtés donnerait deux fonctions du même nom. La fusion n'en garde qu'une :
+
+- `clearFiltersHref(search, sort)`, dans `src/lib/catalog-search.ts`, à côté de `clearSearchHref` ; elle importe le type `CatalogSort` de `catalog-sort.ts`. Celle de `catalog-sort.ts` disparaît.
+- Elle rend `/` sans Recherche et au Tri par défaut, sinon `/?` suivi de `search`, quand une Recherche est active, puis de `sortProperty` et `sortDirection` ensemble, quand le Tri n'est pas celui par défaut.
+- `getCatalog` la rend dans son champ `clearFiltersHref`. `CatalogFilters.astro` et `index.astro` la reçoivent en prop et n'importent plus rien de `catalog-sort.ts`.
+- Les tests de `clearFiltersHref` dans `catalog-sort.test.ts` passent à la nouvelle signature. Un test de `catalog-search.test.ts` prouve, à travers `getCatalog`, que la Recherche et le Tri sont gardés ensemble.
+- `clearSearchHref` n'a rien à changer : elle garde déjà `sortProperty` et `sortDirection`, comme tout paramètre qu'elle ne connaît pas.
