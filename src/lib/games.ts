@@ -4,12 +4,14 @@ import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 import { readCatalogFilters, type CatalogFilters } from './catalog-filters';
 import { categoryCondition } from './category-filter';
+import { readCatalogSearch, searchCondition } from './catalog-search';
 
-/** The home page catalog: the games kept by the filters, the catalog size and the filters kept. */
+/** The home page catalog: the games kept by the filters and the search, the catalog size, and the filters and search kept. */
 export interface Catalog {
     games: Game[];
     total: number;
     filters: CatalogFilters;
+    search: string | null;
 }
 
 const gameSelection = {
@@ -95,15 +97,17 @@ export async function getGameById(db: Database, id: number): Promise<Game | null
 }
 
 /**
- * The games of the filtered catalog: each filter family adds its condition, joined with AND.
+ * The games of the filtered catalog: each filter family and the search add their condition, joined
+ * with AND.
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param filters - The filters kept from the URL.
- * @returns The matching games sorted by title; every game when no filter is active.
+ * @param search - The search kept from the URL, or `null` when there is none.
+ * @returns The matching games sorted by title; every game when neither a filter nor a search is active.
  */
-export async function getCatalogGames(db: Database, filters: CatalogFilters): Promise<Game[]> {
+export async function getCatalogGames(db: Database, filters: CatalogFilters, search: string | null): Promise<Game[]> {
     const rows = await baseGamesQuery(db)
-        .where(and(categoryCondition(filters.categoryIds)))
+        .where(and(categoryCondition(filters.categoryIds), searchCondition(search)))
         .orderBy(asc(games.title));
     return rows.map(mapGame);
 }
@@ -113,11 +117,13 @@ export async function getCatalogGames(db: Database, filters: CatalogFilters): Pr
  *
  * @param db - Injected: pages pass `getDatabase()`, tests an in-memory database.
  * @param searchParams - The home page's raw URL parameters.
- * @returns The matching games sorted by title, the size of the whole catalog, and the filters kept.
+ * @returns The matching games sorted by title, the size of the whole catalog, and the filters and
+ *   search kept.
  */
 export async function getCatalog(db: Database, searchParams: URLSearchParams): Promise<Catalog> {
     const filters = readCatalogFilters(searchParams);
-    const catalogGames = await getCatalogGames(db, filters);
+    const search = readCatalogSearch(searchParams);
+    const catalogGames = await getCatalogGames(db, filters, search);
     const [{ total }] = await db.select({ total: count() }).from(games);
-    return { games: catalogGames, total, filters };
+    return { games: catalogGames, total, filters, search };
 }
