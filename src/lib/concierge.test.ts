@@ -297,7 +297,7 @@ describe('answerConcierge', () => {
         const { askModel } = fakeAskModel(new Error('provider down'));
         const result = await answerConcierge(db, question('Which game?'), { apiKey: API_KEY, askModel });
         expect(result.status).toBe(502);
-        expect(result.body).toEqual({ error: expect.any(String) });
+        expect(result.body).toEqual({ error: expect.stringMatching(/try again/i) });
     });
 
     it.each<[string, ModelReply]>([

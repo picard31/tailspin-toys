@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getDatabase } from '../../lib/db';
 import { answerConcierge, CONCIERGE_OUTPUT_SCHEMA, type AskModel } from '../../lib/concierge';
 
-// Rendered on demand by the Node adapter, while the pages are prerendered.
+// Rendered on demand by the Node adapter, like the home page; the other pages are prerendered.
 export const prerender = false;
 
 /** Ask Claude through the SDK. The client is built at call time, with this key and no other credential. */

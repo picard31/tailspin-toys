@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { getDatabase } from '../../../lib/db';
 import { getGameById } from '../../../lib/games';
 
-// Rendered on demand by the Node adapter, while the pages are prerendered.
+// Rendered on demand by the Node adapter, like the home page; the other pages are prerendered.
 export const prerender = false;
 
 /** GET /api/games/:id: the game as JSON, or `{ error }` with a 400 or 404 status. */
