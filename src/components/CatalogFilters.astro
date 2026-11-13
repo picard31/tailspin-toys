@@ -3,11 +3,13 @@ import type { CatalogFilters } from '../lib/catalog-filters';
 import CategoryFilter from './CategoryFilter.astro';
 
 interface Props {
-    /** The filters kept from the URL, shown as the current state of each control. */
+    /** The filters kept from the URL, shown as the current state of each filter control. */
     filters: CatalogFilters;
+    /** The search kept from the URL, which prefills the search field; `null` leaves it empty. */
+    search: string | null;
 }
 
-const { filters } = Astro.props;
+const { filters, search } = Astro.props;
 
 const focusRing =
     'focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800';
@@ -19,6 +21,19 @@ const focusRing =
     class="mb-4 p-6 bg-slate-800/60 rounded-xl border border-slate-700/50 flex flex-col gap-6"
     data-testid="catalog-filters"
 >
+    {/* No button of its own: Enter submits the whole form, so the search and the filters apply together. */}
+    <div>
+        <label for="catalog-search" class="block text-sm font-medium text-slate-100 mb-3">Search by title</label>
+        <input
+            id="catalog-search"
+            type="search"
+            name="search"
+            value={search}
+            class:list={['w-full sm:max-w-sm px-3 py-2 rounded-lg bg-slate-900 border border-slate-500 text-sm text-slate-100', focusRing]}
+            data-testid="search-input"
+        />
+    </div>
+
     <CategoryFilter selectedIds={filters.categoryIds} />
 
     <div class="flex flex-wrap items-center gap-4">
@@ -27,7 +42,7 @@ const focusRing =
             class:list={['px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors', focusRing]}
             data-testid="apply-filters"
         >
-            Apply filters
+            Apply
         </button>
         <a
             href="/"
