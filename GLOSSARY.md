@@ -25,7 +25,7 @@ Le genre d'un Jeu (Strategy, Puzzle…).
 _À éviter_ : genre, type, tag
 
 **Éditeur** :
-La société qui publie un Jeu.
+La société qui publie des Jeux sur la plateforme. Elle peut n'en avoir encore aucun.
 _À éviter_ : studio, développeur, publisher (dans les docs en français)
 
 **Note** :
@@ -47,3 +47,11 @@ _À éviter_ : chatbot, agent, assistant IA
 **Recommandation** :
 Un Jeu du Catalogue que le Concierge propose en réponse à une question d'un Visiteur.
 _À éviter_ : suggestion, résultat
+
+**Fiche** :
+La page qui présente un seul Jeu, avec sa description, celle de sa Catégorie et celle de son Éditeur.
+_À éviter_ : page de détail, détails du jeu
+
+**Page Éditeur** :
+La page qui présente un Éditeur : sa description et tous ses Jeux. Contrairement au Filtre Éditeur, elle ne restreint pas le Catalogue et ne se combine à aucun Filtre.
+_À éviter_ : profil, vitrine, catalogue de l'Éditeur

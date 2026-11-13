@@ -25,7 +25,7 @@ export interface Game {
     starRating: number | null;
 }
 
-/** A publisher as shown on a game's page: its `description` is null when there is nothing to show. */
+/** A publisher as shown on a game's page and on its own page: its `description` is null when there is nothing to show. */
 export interface PublisherDetails extends Publisher {
     description: string | null;
 }
